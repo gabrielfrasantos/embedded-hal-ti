@@ -6,8 +6,6 @@ function(add_hal_driver target_name manufacturer manufacturer_family)
 
     file(GLOB manufacturer_include RELATIVE ${CMAKE_CURRENT_LIST_DIR} CMSIS/Device/${manufacturer}/${manufacturer_family}*)
 
-    message("manufacturer_include = ${CMAKE_CURRENT_LIST_DIR}/${manufacturer_include}")
-
     target_include_directories(${target_name} PUBLIC
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/CMSIS/Core/Include>"
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/${manufacturer_include}/Include>"

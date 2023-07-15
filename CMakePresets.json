@@ -35,9 +35,9 @@
       }
     },
     {
-      "name": "tm4c123g",
-      "displayName": "tm4c123g",
-      "description": "Build for tm4c123g",
+      "name": "tm4c123gh6pm",
+      "displayName": "tm4c123gh6pm",
+      "description": "Build for tm4c123gh6pm",
       "inherits": "tiva",
       "toolchainFile": "${sourceDir}/build/${presetName}/_deps/emil-src/cmake/toolchain-arm-gcc-m4-fpv4-sp-d16.cmake",
       "cacheVariables": {

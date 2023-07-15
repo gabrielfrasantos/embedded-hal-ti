@@ -13,8 +13,6 @@ add_library(ti.hal_driver ${HAL_TI_EXCLUDE_FROM_ALL} INTERFACE)
 install(TARGETS ti.hal_driver EXPORT halTivaTargets)
 
 if (TARGET_MCU_VENDOR STREQUAL ti)
-    message ("TARGET_MCU_VENDOR is ti")
-
     target_link_libraries(ti.hal_driver INTERFACE
         ti.hal_driver_${TARGET_MCU_FAMILY}
     )
