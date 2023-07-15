@@ -7,7 +7,7 @@ target_include_directories(hal_tiva.default_init PUBLIC
 )
 
 target_link_libraries(hal_tiva.default_init PUBLIC
-    st.hal_driver
+    ti.hal_driver
     hal_tiva.cortex
 )
 
@@ -20,7 +20,7 @@ target_sources(hal_tiva.default_init PRIVATE
 )
 
 if (TARGET_MCU_VENDOR STREQUAL st)
-    get_target_property(startup_source st.hal_driver_${TARGET_MCU_FAMILY} HAL_TI_STARTUP_SOURCE)
+    get_target_property(startup_source ti.hal_driver_${TARGET_MCU_FAMILY} HAL_TI_STARTUP_SOURCE)
 
     target_sources(hal_tiva.default_init PRIVATE
         ${startup_source}

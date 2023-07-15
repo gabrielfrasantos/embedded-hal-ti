@@ -7,7 +7,7 @@ target_include_directories(hal_tiva.cortex PUBLIC
 )
 
 target_link_libraries(hal_tiva.cortex PUBLIC
-    st.hal_driver
+    ti.hal_driver
     infra.event
 )
 

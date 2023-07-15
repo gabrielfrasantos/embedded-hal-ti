@@ -26,12 +26,6 @@ extern "C"
         return static_cast<caddr_t>(current_block_address);
     }
 
-    // Avoid the SysTick handler from being initialised by HAL_Init
-    HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
-    {
-        return HAL_OK;
-    }
-
     [[gnu::weak]] void Default_Handler_Forwarded()
     {
         hal::InterruptTable::Instance().Invoke(hal::ActiveInterrupt());
@@ -40,7 +34,7 @@ extern "C"
     void abort()
     {
         __BKPT();
-        HAL_NVIC_SystemReset();
+        NVIC_SystemReset();
         __builtin_unreachable();
     }
 

@@ -1,58 +1,45 @@
-# function(add_hal_driver target_name hal_driver cmsis)
+function(add_hal_driver target_name manufacturer manufacturer_family)
 
-#     add_library(${target_name} STATIC)
-#     install(TARGETS ${target_name} EXPORT halStTargets)
+    add_library(${target_name} STATIC)
 
-#     file(GLOB st_include RELATIVE ${CMAKE_CURRENT_LIST_DIR} ${cmsis}/Device/ST/STM32*)
+    install(TARGETS ${target_name} EXPORT halTivaTargets)
 
-#     target_include_directories(${target_name} PUBLIC
-#         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/${hal_driver}/Inc>"
-#         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/${cmsis}/Core/Include>"
-#         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/${st_include}/Include>"
-#         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/hal_conf>"
-#         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${hal_driver}/Inc>"
-#         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${cmsis}/Core/Include>"
-#         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${st_include}/Include>"
-#         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hal_conf>"
-#     )
+    file(GLOB manufacturer_include RELATIVE ${CMAKE_CURRENT_LIST_DIR} CMSIS/Device/${manufacturer}/${manufacturer_family}*)
 
-#     target_compile_definitions(${target_name} PUBLIC
-#         USE_HAL_DRIVER=1
-#         USE_FULL_LL_DRIVER=1
-#         $<$<NOT:$<CONFIG:MinSizeRel>>:USE_FULL_ASSERT=1>
-#     )
+    message("manufacturer_include = ${CMAKE_CURRENT_LIST_DIR}/${manufacturer_include}")
 
-#     # Assembler does not understand -Werror
-#     set_target_properties(${target_name} PROPERTIES COMPILE_WARNING_AS_ERROR Off)
+    target_include_directories(${target_name} PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/CMSIS/Core/Include>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/${manufacturer_include}/Include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/CMSIS/Core/Include>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${manufacturer_include}/Include>"
+    )
 
-#     file(GLOB sources_in RELATIVE ${CMAKE_CURRENT_LIST_DIR}
-#         ${hal_driver}/Inc/*.h
-#         ${hal_driver}/Src/*.c
-#         ${cmsis}/Core/Include/*.h
-#         ${cmsis}/Device/ST/*/Include/*.h
-#         ${cmsis}/Device/ST/*/Source/Templates/system_*.c
-#         hal_conf/*_hal_conf.h
-#     )
-#     set(sources)
-#     foreach(source ${sources_in})
-#         if (NOT ${source} MATCHES "_template.")
-#             list(APPEND sources ${source})
-#         endif()
-#     endforeach()
+    file(GLOB sources_in RELATIVE ${CMAKE_CURRENT_LIST_DIR}
+        CMSIS/Core/Include/*.h
+        CMSIS/Device/${manufacturer}/*/Include/*.h
+        CMSIS/Device/${manufacturer}/*/Source/Templates/system_*.c
+    )
 
-#     target_sources(${target_name} PRIVATE
-#         ${sources}
-#     )
+    set(sources)
+    foreach(source ${sources_in})
+        if (NOT ${source} MATCHES "_template.")
+            list(APPEND sources ${source})
+        endif()
+    endforeach()
 
-#     file(GLOB startup_source
-#         ${cmsis}/Device/ST/*/Source/Templates/gcc/startup_${TARGET_MCU}xx.s
-#         ${cmsis}/Device/ST/*/Source/Templates/gcc/startup_${TARGET_MCU}xx_cm4.s
-#     )
+    target_sources(${target_name} PRIVATE
+        ${sources}
+    )
 
-#     if (startup_source)
-#         set_target_properties(${target_name} PROPERTIES HALST_STARTUP_SOURCE ${startup_source})
-#     endif()
+    file(GLOB startup_source
+        CMSIS/Device/${manufacturer}/*/Source/Templates/gcc/startup_${manufacturer_family}.c
+    )
 
-# endfunction()
+    if (startup_source)
+        set_target_properties(${target_name} PROPERTIES HAL_TI_STARTUP_SOURCE ${startup_source})
+    endif()
 
-# define_property(TARGET PROPERTY HALST_STARTUP_SOURCE  BRIEF_DOCS "Startup source" FULL_DOCS "The source file that contains the startup and interrupt vector code.")
+endfunction()
+
+define_property(TARGET PROPERTY HAL_TI_STARTUP_SOURCE  BRIEF_DOCS "Startup source" FULL_DOCS "The source file that contains the startup and interrupt vector code.")

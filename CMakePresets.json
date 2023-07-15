@@ -42,9 +42,8 @@
       "toolchainFile": "${sourceDir}/build/${presetName}/_deps/emil-src/cmake/toolchain-arm-gcc-m4-fpv4-sp-d16.cmake",
       "cacheVariables": {
         "TARGET_CORTEX": "m4",
-        "TARGET_MCU_FAMILY": "tm4c123x",
-        "TARGET_MCU": "tm4c123g",
-        "TARGET_MCU_VARIANT": "TM4C123GH6PM"
+        "TARGET_MCU_FAMILY": "TM4C123",
+        "TARGET_MCU": "tm4c123gh6pm"
       }
     }
   ],
