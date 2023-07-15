@@ -54,9 +54,9 @@
       "configurePreset": "host"
     },
     {
-      "name": "tm4c123g-RelWithDebInfo",
+      "name": "tm4c123gh6pm-RelWithDebInfo",
       "configuration": "RelWithDebInfo",
-      "configurePreset": "tm4c123g"
+      "configurePreset": "tm4c123gh6pm"
     }
   ]
 }
