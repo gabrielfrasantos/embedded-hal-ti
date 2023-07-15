@@ -18,17 +18,17 @@ jobs:
       matrix:
         configuration: ["RelWithDebInfo"]
         gcc: [ "10.3-2021.10" ]
-        target: ["tmc123gh6pm"]
+        target: ["tm4c123gh6pm"]
         include:
           - gcc: "7-2018-q2"
             configuration: "RelWithDebInfo"
-            target: "tmc123gh6pm"
+            target: "tm4c123gh6pm"
           - gcc: "8-2019-q3"
             configuration: "RelWithDebInfo"
-            target: "tmc123gh6pm"
+            target: "tm4c123gh6pm"
           - gcc: "9-2020-q2"
             configuration: "RelWithDebInfo"
-            target: "tmc123gh6pm"
+            target: "tm4c123gh6pm"
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
       - name: Install GNU Arm Embedded Toolchain ${{ matrix.gcc }}

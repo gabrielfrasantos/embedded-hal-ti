@@ -33,16 +33,12 @@
 // Forward declaration of the default fault handlers.
 //
 //*****************************************************************************
-static void DefaultInternal_Handler(void);
-void Reset_Handler(void);
-void Default_Handler(void);
-extern void HardFault_Handler(void);
-extern void MemManage_Handler(void);
-extern void BusFault_Handler(void);
-extern void UsageFault_Handler(void);
-void SVC_Handler(void) __attribute__((weak, alias("DefaultInternal_Handler")));
-void PendSV_Handler(void) __attribute__((weak, alias("DefaultInternal_Handler")));
-void SysTick_Handler(void) __attribute__((weak, alias("DefaultInternal_Handler")));
+static void Default_Handler();
+static void Reset_Handler();
+extern void Default_Handler_Forwarded();
+void SVC_Handler() __attribute__((weak, alias("DefaultInternal_Handler")));
+void PendSV_Handler() __attribute__((weak, alias("DefaultInternal_Handler")));
+void SysTick_Handler() __attribute__((weak, alias("DefaultInternal_Handler")));
 
 //*****************************************************************************
 //
@@ -80,10 +76,10 @@ __attribute__((section(".isr_vector"))) void (*const g_pfnVectors[])(void) = {
    (void*)&_estack, /*!< The initial stack pointer, 0x20008000 32K */
    Reset_Handler, /*!< The reset handler */
    Default_Handler, /*!< NMI_Handler,               The NMI handler */
-   HardFault_Handler, /*!< HardFault_Handler,         The hard fault handler */
-   MemManage_Handler, /*!< MemManage_Handler,         The MPU fault handler */
-   BusFault_Handler, /*!< BusFault_Handler,          The bus fault handler */
-   UsageFault_Handler, /*!< UsageFault_Handler,        The usage fault handler */
+   Default_Handler, /*!< HardFault_Handler,         The hard fault handler */
+   Default_Handler, /*!< MemManage_Handler,         The MPU fault handler */
+   Default_Handler, /*!< BusFault_Handler,          The bus fault handler */
+   Default_Handler, /*!< UsageFault_Handler,        The usage fault handler */
    0, /*!< Reserved */
    0, /*!< Reserved */
    0, /*!< Reserved */
@@ -259,7 +255,7 @@ extern uint32_t _ebss;
 // application.
 //
 //*****************************************************************************
-void Reset_Handler(void)
+static void Reset_Handler()
 {
     uint32_t *pui32Src, *pui32Dest;
 
@@ -336,7 +332,7 @@ void __libc_init_local(void)
 // for examination by a debugger.
 //
 //*****************************************************************************
-static void DefaultInternal_Handler(void)
+static void DefaultInternal()
 {
-    while (1) { }
+    Default_Handler_Forwarded();
 }
