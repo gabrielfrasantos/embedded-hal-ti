@@ -15,8 +15,6 @@ target_link_libraries(hal_tiva.tiva PUBLIC
 )
 
 target_sources(hal_tiva.tiva PRIVATE
-    Dummy.hpp
-    Dummy.cpp
 #    AnalogToDigitalPinStm.cpp
 #    AnalogToDigitalPinStm.hpp
 #    CanStm.cpp
@@ -29,8 +27,8 @@ target_sources(hal_tiva.tiva PRIVATE
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:DmaStm.hpp>
 #    FlashInternalStm.cpp
 #    FlashInternalStm.hpp
-#    GpioStm.cpp
-#    GpioStm.hpp
+    Gpio.cpp
+    Gpio.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.hpp>
 #    ResetStm.cpp
@@ -43,10 +41,10 @@ target_sources(hal_tiva.tiva PRIVATE
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.hpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.hpp>
-#    SystemTickStm.cpp
-#    SystemTickStm.hpp
-#    SystemTickTimerService.cpp
-#    SystemTickTimerService.hpp
+    SystemTickStm.cpp
+    SystemTickStm.hpp
+    SystemTickTimerService.cpp
+    SystemTickTimerService.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStm.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStm.hpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStmDma.cpp>

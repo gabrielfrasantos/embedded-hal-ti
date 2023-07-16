@@ -35,11 +35,3 @@ namespace hal
         SystemTickInterrupt();
     }
 }
-
-extern "C" uint32_t HAL_GetTick()
-{
-    if (hal::SystemTickTimerService::InstanceSet())
-        return std::chrono::duration_cast<std::chrono::milliseconds>(hal::SystemTickTimerService::Instance().Now().time_since_epoch()).count();
-    else
-        return 0;
-}

@@ -5,8 +5,6 @@
 #include "infra/timer/TickOnInterruptTimerService.hpp"
 #include "infra/util/InterfaceConnector.hpp"
 
-extern "C" uint32_t HAL_GetTick();
-
 namespace hal
 {
     class SystemTickTimerService
@@ -20,8 +18,6 @@ namespace hal
         virtual infra::TimePoint Now() const override;
 
     private:
-        friend uint32_t ::HAL_GetTick();
-
         void Invoke() override;
     };
 }
