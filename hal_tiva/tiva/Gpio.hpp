@@ -9,6 +9,37 @@
 
 namespace hal::tiva
 {
+    enum class PinConfigPeripheral
+    {
+        i2cScl,
+        i2cSda,
+        uartTx,
+        uartRx,
+        uartRts,
+        uartCts,
+        canTx,
+        canRx,
+        spiClock,
+        spiMiso,
+        spiMosi,
+        spiSlaveSelect,
+        usbFsId,
+        usbFsDm,
+        usbFsDp,
+        pwmFault,
+        pwmChannel0,
+        pwmChannel1,
+        pwmChannel2,
+        pwmChannel3,
+        pwmChannel4,
+        pwmChannel5,
+        pwmChannel6,
+        pwmChannel7,
+        qeiIndex,
+        qeiPhaseA,
+        qeiPhaseB,
+    };
+
     enum class Type : uint8_t
     {
         adc,
@@ -64,7 +95,7 @@ namespace hal::tiva
         virtual void DisableInterrupt() override;
 
         virtual void ConfigAnalog();
-        virtual void ConfigPeripheral(uint8_t pinConfigType);
+        virtual void ConfigPeripheral(PinConfigPeripheral pinConfigType);
 
         uint32_t AdcChannel(uint8_t adc) const;
 
@@ -92,7 +123,7 @@ namespace hal::tiva
         virtual void EnableInterrupt(const infra::Function<void()>& action, InterruptTrigger trigger) override;
         virtual void DisableInterrupt() override;
         virtual void ConfigAnalog() override;
-        virtual void ConfigPeripheral(uint8_t pinConfigType) override;
+        virtual void ConfigPeripheral(PinConfigPeripheral pinConfigType) override;
     };
 
     extern DummyPin dummyPin;
@@ -100,7 +131,7 @@ namespace hal::tiva
     class PeripheralPin
     {
     public:
-        PeripheralPin(GpioPin& pin, uint8_t pinConfigType);
+        PeripheralPin(GpioPin& pin, PinConfigPeripheral pinConfigType);
         PeripheralPin(const PeripheralPin& other) = delete;
         PeripheralPin& operator=(const PeripheralPin& other) = delete;
         ~PeripheralPin();
@@ -130,7 +161,7 @@ namespace hal::tiva
 
         void ResetConfig();
         void ConfigAnalog();
-        void ConfigPeripheral(uint8_t pinConfigType);
+        void ConfigPeripheral(PinConfigPeripheral pinConfigType);
 
     private:
         infra::MemoryRange<const std::pair<Port, uint8_t>> table;
@@ -141,7 +172,7 @@ namespace hal::tiva
     class MultiPeripheralPin
     {
     public:
-        MultiPeripheralPin(MultiGpioPin& pins, uint8_t pinConfigType);
+        MultiPeripheralPin(MultiGpioPin& pins, PinConfigPeripheral pinConfigType);
         MultiPeripheralPin(const MultiPeripheralPin& other) = delete;
         MultiPeripheralPin& operator=(const MultiPeripheralPin& other) = delete;
         ~MultiPeripheralPin();
@@ -173,9 +204,10 @@ namespace hal::tiva
 
         struct PinoutTable
         {
-            uint8_t pinConfigType;
+            PinConfigPeripheral pinConfigType;
             infra::MemoryRange<const PinPosition> pinPositions;
             Drive drive;
+            PinConfigType config;
             Current current;
         };
 
@@ -183,7 +215,7 @@ namespace hal::tiva
         Gpio(infra::MemoryRange<const infra::MemoryRange<const Gpio::PinoutTable>> pinoutTable, infra::MemoryRange<const Gpio::AnalogPinPosition> analogTable = infra::MemoryRange<const Gpio::AnalogPinPosition>());
 
     public:
-        std::pair<const PinPosition&, const PinoutTable&> GetPeripheralPinConfig(Port port, uint8_t index, uint8_t pinConfigType) const;
+        std::pair<const PinPosition&, const PinoutTable&> GetPeripheralPinConfig(Port port, uint8_t index, PinConfigPeripheral pinConfigType) const;
         uint32_t AdcChannel(Port port, uint8_t index, uint8_t adc) const;
 
         void EnableInterrupt(Port port, uint8_t index, const infra::Function<void()>& action, InterruptTrigger trigger);

@@ -242,7 +242,7 @@ namespace hal::tiva
         infra::ReplaceBits(GpioTiva(port)->AMSEL, Gpio::registerSize, true, index);
     }
 
-    void GpioPin::ConfigPeripheral(uint8_t pinConfigType)
+    void GpioPin::ConfigPeripheral(PinConfigPeripheral pinConfigType)
     {
         std::pair<const Gpio::PinPosition&, const Gpio::PinoutTable&> peripheralPinConfig = Gpio::Instance().GetPeripheralPinConfig(port, index, pinConfigType);
 
@@ -319,10 +319,10 @@ namespace hal::tiva
     void DummyPin::ConfigAnalog()
     {}
 
-    void DummyPin::ConfigPeripheral(uint8_t pinConfigType)
+    void DummyPin::ConfigPeripheral(PinConfigPeripheral pinConfigType)
     {}
 
-    PeripheralPin::PeripheralPin(GpioPin& pin, uint8_t pinConfigType)
+    PeripheralPin::PeripheralPin(GpioPin& pin, PinConfigPeripheral pinConfigType)
         : pin(pin)
     {
         pin.ConfigPeripheral(pinConfigType);
@@ -407,7 +407,7 @@ namespace hal::tiva
         }
     }
 
-    void MultiGpioPin::ConfigPeripheral(uint8_t pinConfigType)
+    void MultiGpioPin::ConfigPeripheral(PinConfigPeripheral pinConfigType)
     {
         for (const std::pair<Port, uint8_t>& portAndIndex : table)
         {
@@ -434,7 +434,7 @@ namespace hal::tiva
         }
     }
 
-    MultiPeripheralPin::MultiPeripheralPin(MultiGpioPin& pins, uint8_t pinConfigType)
+    MultiPeripheralPin::MultiPeripheralPin(MultiGpioPin& pins, PinConfigPeripheral pinConfigType)
         : pins(pins)
     {
         pins.ConfigPeripheral(pinConfigType);
@@ -465,7 +465,7 @@ namespace hal::tiva
     { }
     // clang-format on
 
-    std::pair<const Gpio::PinPosition&, const Gpio::PinoutTable&> Gpio::GetPeripheralPinConfig(Port port, uint8_t index, uint8_t pinConfigType) const
+    std::pair<const Gpio::PinPosition&, const Gpio::PinoutTable&> Gpio::GetPeripheralPinConfig(Port port, uint8_t index, PinConfigPeripheral pinConfigType) const
     {
         for (infra::MemoryRange<const Gpio::PinoutTable> subTable : pinoutTable)
             for (const PinoutTable& table : subTable)

@@ -31,7 +31,7 @@ target_sources(hal_tiva.tiva PRIVATE
     Gpio.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.hpp>
-    #PinoutTableDefault.cpp
+    PinoutTableDefault.cpp
     PinoutTableDefault.hpp
     Reset.cpp
     Reset.hpp
