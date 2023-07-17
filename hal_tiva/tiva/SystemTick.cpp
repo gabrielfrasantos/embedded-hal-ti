@@ -1,10 +1,9 @@
-#include "hal_tiva/tiva/SystemTickStm.hpp"
+#include "hal_tiva/tiva/SystemTick.hpp"
 #include DEVICE_HEADER
-#include "hal/interfaces/Gpio.hpp"
 
 namespace hal
 {
-    SystemTickStm::SystemTickStm(const infra::Function<void()>& callback, infra::Duration tickDuration)
+    SystemTick::SystemTick(const infra::Function<void()>& callback, infra::Duration tickDuration)
         : callback(callback)
     {
         Register(SysTick_IRQn);
@@ -13,7 +12,7 @@ namespace hal
         SysTick->VAL = 0;
     }
 
-    void SystemTickStm::Invoke()
+    void SystemTick::Invoke()
     {
         callback();
     }

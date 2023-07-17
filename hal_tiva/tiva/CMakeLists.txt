@@ -19,8 +19,8 @@ target_sources(hal_tiva.tiva PRIVATE
 #    AnalogToDigitalPinStm.hpp
 #    CanStm.cpp
 #    CanStm.hpp
-#    $<$<STREQUAL:${TARGET_MCU},tm4c123g>:DefaultClockEkTm4c123gxl.cpp>
-#    $<$<STREQUAL:${TARGET_MCU},tm4c123g>:DefaultClockEkTm4c123gxl.hpp>
+    $<$<STREQUAL:${TARGET_MCU},tm4c123gh6pm>:DefaultClockEkTm4c123gxl.cpp>
+    $<$<STREQUAL:${TARGET_MCU},tm4c123gh6pm>:DefaultClockEkTm4c123gxl.hpp>
 #    DigitalToAnalogPinStm.cpp
 #    DigitalToAnalogPinStm.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:DmaStm.cpp>
@@ -31,8 +31,10 @@ target_sources(hal_tiva.tiva PRIVATE
     Gpio.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.hpp>
-#    ResetStm.cpp
-#    ResetStm.hpp
+    #PinoutTableDefault.cpp
+    PinoutTableDefault.hpp
+    Reset.cpp
+    Reset.hpp
 #    SpiDataSizeConfiguratorStm.cpp
 #    SpiDataSizeConfiguratorStm.hpp
 #    SpiMasterStm.cpp
@@ -41,8 +43,8 @@ target_sources(hal_tiva.tiva PRIVATE
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.hpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.hpp>
-    SystemTickStm.cpp
-    SystemTickStm.hpp
+    SystemTick.cpp
+    SystemTick.hpp
     SystemTickTimerService.cpp
     SystemTickTimerService.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStm.cpp>

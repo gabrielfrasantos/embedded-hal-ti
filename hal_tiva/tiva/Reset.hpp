@@ -1,12 +1,12 @@
-#ifndef HAL_RESET_STM_HPP
-#define HAL_RESET_STM_HPP
+#ifndef HAL_RESET_TIVA_HPP
+#define HAL_RESET_TIVA_HPP
 
 #include "hal/interfaces/Reset.hpp"
 
-namespace hal
+namespace hal::tiva
 {
-    class ResetStm
-        : public Reset
+    class Reset
+        : public hal::Reset
     {
     public:
         virtual void ResetModule(const char* resetReason) override;

@@ -451,17 +451,17 @@ namespace hal::tiva
         , analogTable(analogTable)
         , assignedPins()
         , interruptDispatcherA(GPIOA_IRQn, [this]()
-            { ExtiInterrupt(GPIOA_IRQn, 0, 8); })
+            { ExtiInterrupt(GPIOA, 0, 8); })
         , interruptDispatcherB(GPIOB_IRQn, [this]()
-            { ExtiInterrupt(GPIOB_IRQn, 0, 8); })
+            { ExtiInterrupt(GPIOB, 0, 8); })
         , interruptDispatcherC(GPIOC_IRQn, [this]()
-            { ExtiInterrupt(GPIOC_IRQn, 0, 8); })
+            { ExtiInterrupt(GPIOC, 0, 8); })
         , interruptDispatcherD(GPIOD_IRQn, [this]()
-            { ExtiInterrupt(GPIOD_IRQn, 0, 8); })
+            { ExtiInterrupt(GPIOD, 0, 8); })
         , interruptDispatcherE(GPIOE_IRQn, [this]()
-            { ExtiInterrupt(GPIOE_IRQn, 0, 8); })
+            { ExtiInterrupt(GPIOE, 0, 8); })
         , interruptDispatcherF(GPIOF_IRQn, [this]()
-            { ExtiInterrupt(GPIOF_IRQn, 0, 8); })
+            { ExtiInterrupt(GPIOF, 0, 8); })
     { }
     // clang-format on
 
@@ -488,76 +488,39 @@ namespace hal::tiva
 
     void Gpio::EnableInterrupt(Port port, uint8_t index, const infra::Function<void()>& action, InterruptTrigger trigger)
     {
-//        uint32_t extiMask = 0xf << ((index & 0x03) << 2);
-//        uint32_t extiValue = static_cast<uint8_t>(port) << ((index & 0x03) << 2);
-//#if defined(STM32G0)
-//        EXTI->EXTICR[index >> 2] = (EXTI->EXTICR[index >> 2] & ~extiMask) | extiValue;
-//#else
-//        SYSCFG->EXTICR[index >> 2] = (SYSCFG->EXTICR[index >> 2] & ~extiMask) | extiValue;
-//#endif
-//
-//#if defined(STM32WB) || defined(STM32G4) || defined(STM32G0)
-//        if (trigger != InterruptTrigger::fallingEdge)
-//            EXTI->RTSR1 |= 1 << index;
-//        else
-//            EXTI->RTSR1 &= ~(1 << index);
-//
-//        if (trigger != InterruptTrigger::risingEdge)
-//            EXTI->FTSR1 |= 1 << index;
-//        else
-//            EXTI->FTSR1 &= ~(1 << index);
-//
-//        EXTI->IMR1 |= 1 << index;
-//#else
-//        if (trigger != InterruptTrigger::fallingEdge)
-//            EXTI->RTSR |= 1 << index;
-//        else
-//            EXTI->RTSR &= ~(1 << index);
-//
-//        if (trigger != InterruptTrigger::risingEdge)
-//            EXTI->FTSR |= 1 << index;
-//        else
-//            EXTI->FTSR &= ~(1 << index);
-//
-//        EXTI->IMR |= 1 << index;
-//#endif
-//        really_assert(!handlers[index]);
-//        handlers[index] = action;
+        infra::ReplaceBit(GpioTiva(port)->IM, false, index);
+
+        infra::ReplaceBit(GpioTiva(port)->IBE, interruptTiva[static_cast<uint8_t>(trigger)].ibe, index);
+        infra::ReplaceBit(GpioTiva(port)->IS, interruptTiva[static_cast<uint8_t>(trigger)].is, index);
+        infra::ReplaceBit(GpioTiva(port)->IEV, interruptTiva[static_cast<uint8_t>(trigger)].iev, index);
+
+        really_assert(!handlers[index]);
+        handlers[index] = action;
+
+        infra::ReplaceBit(GpioTiva(port)->RIS, false, index);
+        infra::ReplaceBit(GpioTiva(port)->ICR, true, index);
+        infra::ReplaceBit(GpioTiva(port)->IM, true, index);
     }
 
     void Gpio::DisableInterrupt(Port port, uint8_t index)
     {
-//#if defined(STM32WB) || defined(STM32G4) || defined(STM32G0)
-//        EXTI->IMR1 &= ~(1 << index);
-//#else
-//        EXTI->IMR &= ~(1 << index);
-//#endif
-//        handlers[index] = nullptr;
+        infra::ReplaceBit(GpioTiva(port)->IM, false, index);
+
+        handlers[index] = nullptr;
     }
 
-    void Gpio::ExtiInterrupt(IRQn_Type irq, std::size_t from, std::size_t to)
+    void Gpio::ExtiInterrupt(GPIOA_Type* gpio, std::size_t from, std::size_t to)
     {
-//        for (std::size_t line = from; line != to; ++line)
-//        {
-//#if defined(STM32WB) || defined(STM32G4)
-//            if (EXTI->PR1 & (1 << line))
-//            {
-//                EXTI->PR1 &= (1 << line); // Interrupt pending is cleared by writing a 1 to it
-//#elif defined(STM32G0)
-//            if ((EXTI->RPR1 & (1 << line)) || (EXTI->FPR1 & (1 << line)))
-//            {
-//                EXTI->RPR1 &= (1 << line); // Interrupt pending is cleared by writing a 1 to it
-//                EXTI->FPR1 &= (1 << line); // Interrupt pending is cleared by writing a 1 to it
-//#else
-//            if (EXTI->PR & (1 << line))
-//            {
-//                EXTI->PR &= (1 << line); // Interrupt pending is cleared by writing a 1 to it
-//#endif
-//                if (handlers[line])
-//                    infra::EventDispatcher::Instance().Schedule(handlers[line]);
-//                NVIC_ClearPendingIRQ(irq);
-//            }
-//        }
+        for (std::size_t line = from; line != to; ++line)
+        {
+            if (infra::IsBitSet(gpio->RIS, line))
+            {
+                infra::ReplaceBit(gpio->ICR, true, line);
+
+                if (handlers[line])
+                    infra::EventDispatcher::Instance().Schedule(handlers[line]);
+            }
+        }
     }
 
     void Gpio::ReservePin(Port port, uint8_t index)

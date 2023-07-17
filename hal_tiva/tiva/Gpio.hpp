@@ -195,7 +195,7 @@ namespace hal::tiva
         static constexpr uint32_t registerSize = 4;
 
     private:
-        void ExtiInterrupt(IRQn_Type irq, std::size_t from, std::size_t to);
+        void ExtiInterrupt(GPIOA_Type* gpio, std::size_t from, std::size_t to);
 
         infra::MemoryRange<const infra::MemoryRange<const Gpio::PinoutTable>> pinoutTable;
         infra::MemoryRange<const Gpio::AnalogPinPosition> analogTable;
