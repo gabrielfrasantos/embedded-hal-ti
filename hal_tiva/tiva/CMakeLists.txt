@@ -55,8 +55,8 @@ target_sources(hal_tiva.tiva PRIVATE
 #    $<$<OR:$<STREQUAL:${TARGET_MCU},stm32wb55>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32f7xx>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32g4xx>>:UartStmDuplexDma.hpp>
 #    UsbLinkLayerStm.cpp
 #    UsbLinkLayerStm.hpp
-#    UniqueDeviceId.cpp
-#    UniqueDeviceId.hpp
+    UniqueDeviceId.cpp
+    UniqueDeviceId.hpp
 #    WatchDogStm.cpp
 #    WatchDogStm.hpp
 )
