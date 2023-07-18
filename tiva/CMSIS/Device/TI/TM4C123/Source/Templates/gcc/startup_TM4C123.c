@@ -50,11 +50,12 @@ extern unsigned long _data;
 extern unsigned long _edata;
 extern unsigned long _bss;
 extern unsigned long _ebss;
-extern void (*__preinit_array_start[])(void);
-extern void (*__preinit_array_end[])(void);
-extern void (*__init_array_start[])(void);
-extern void (*__init_array_end[])(void);
+extern void (*__preinit_array_start[])();
+extern void (*__preinit_array_end[])();
+extern void (*__init_array_start[])();
+extern void (*__init_array_end[])();
 extern void _init(void);
+extern void HardwareInitialization();
 
 //*****************************************************************************
 //
@@ -302,9 +303,14 @@ static void Reset_Handler()
     __asm volatile("cpsie i");
 
     //
+    // Call the hardware's initialization function.
+    //
+    HardwareInitialization():
+
+    //
     // Call the application's entry point.
     //
-    os_startup();
+    main();
 }
 
 void __libc_init_local(void)

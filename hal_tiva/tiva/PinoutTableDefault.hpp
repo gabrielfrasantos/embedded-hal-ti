@@ -7,6 +7,7 @@
 namespace hal::tiva
 {
     extern const infra::MemoryRange<const infra::MemoryRange<const Gpio::PinoutTable>> pinoutTableDefault;
+    extern const infra::MemoryRange<const Gpio::AnalogPinPosition> analogTableDefault;
 
     extern const infra::MemoryRange<const Gpio::PinoutTable> pinoutTableUart;
     extern const infra::MemoryRange<const Gpio::PinoutTable> pinoutTableSpi;

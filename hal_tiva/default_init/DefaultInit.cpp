@@ -1,5 +1,7 @@
 #include DEVICE_HEADER
 #include "hal_tiva/cortex/InterruptCortex.hpp"
+#include "hal_tiva/tiva/Gpio.hpp"
+#include "hal_tiva/tiva/PinoutTableDefault.hpp"
 #include <errno.h>
 #include <sys/types.h>
 
@@ -49,5 +51,11 @@ extern "C"
     void assert_failed(uint8_t* file, uint32_t line)
     {
         std::abort();
+    }
+
+    void HardwareInitialization()
+    {
+        static hal::InterruptTable::WithStorage<128> interruptTable;
+        static hal::tiva::Gpio gpio{ hal::tiva::pinoutTableDefault, hal::tiva::analogTableDefault };
     }
 }

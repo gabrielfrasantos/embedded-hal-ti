@@ -47,8 +47,8 @@ target_sources(hal_tiva.tiva PRIVATE
     SystemTick.hpp
     SystemTickTimerService.cpp
     SystemTickTimerService.hpp
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStm.cpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStm.hpp>
+    #Uart.cpp
+    #Uart.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStmDma.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStmDma.hpp>
 #    $<$<OR:$<STREQUAL:${TARGET_MCU},stm32wb55>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32f7xx>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32g4xx>>:UartStmDuplexDma.cpp>

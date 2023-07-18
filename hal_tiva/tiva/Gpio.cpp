@@ -271,9 +271,9 @@ namespace hal::tiva
         infra::ReplaceBits(GpioTiva(port)->DR8R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
     }
 
-    uint32_t GpioPin::AdcChannel(uint8_t adc) const
+    uint32_t GpioPin::AdcChannel() const
     {
-        return Gpio::Instance().AdcChannel(port, index, adc);
+        return Gpio::Instance().AdcChannel(port, index);
     }
 
     DummyPin::DummyPin()
@@ -344,9 +344,9 @@ namespace hal::tiva
         pin.ResetConfig();
     }
 
-    uint32_t AnalogPin::AdcChannel(uint8_t adc) const
+    uint32_t AnalogPin::AdcChannel() const
     {
-        return pin.AdcChannel(adc);
+        return pin.AdcChannel();
     }
 
     MultiGpioPin::MultiGpioPin(infra::MemoryRange<const std::pair<Port, uint8_t>> table, Drive drive, Current current)
@@ -477,10 +477,10 @@ namespace hal::tiva
         abort();
     }
 
-    uint32_t Gpio::AdcChannel(Port port, uint8_t pin, uint8_t instance) const
+    uint32_t Gpio::AdcChannel(Port port, uint8_t pin) const
     {
         for (const Gpio::AnalogPinPosition position : analogTable)
-            if (position.type == Type::adc && position.instance == instance && position.port == port && position.pin == pin)
+            if (position.type == Type::adc && position.port == port && position.pin == pin)
                 return position.channel;
 
         abort();

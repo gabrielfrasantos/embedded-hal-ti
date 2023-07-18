@@ -9,7 +9,7 @@
 
 namespace hal::tiva
 {
-    enum class PinConfigPeripheral
+    enum class PinConfigPeripheral : uint8_t
     {
         i2cScl,
         i2cSda,
@@ -97,7 +97,7 @@ namespace hal::tiva
         virtual void ConfigAnalog();
         virtual void ConfigPeripheral(PinConfigPeripheral pinConfigType);
 
-        uint32_t AdcChannel(uint8_t adc) const;
+        uint32_t AdcChannel() const;
 
     private:
         Port port;
@@ -148,7 +148,7 @@ namespace hal::tiva
         AnalogPin& operator=(const AnalogPin& other) = delete;
         ~AnalogPin();
 
-        uint32_t AdcChannel(uint8_t adc) const;
+        uint32_t AdcChannel() const;
 
     private:
         GpioPin& pin;
@@ -195,7 +195,6 @@ namespace hal::tiva
 
         struct AnalogPinPosition
         {
-            uint8_t instance;
             Type type;
             Port port;
             uint8_t pin;
@@ -216,7 +215,7 @@ namespace hal::tiva
 
     public:
         std::pair<const PinPosition&, const PinoutTable&> GetPeripheralPinConfig(Port port, uint8_t index, PinConfigPeripheral pinConfigType) const;
-        uint32_t AdcChannel(Port port, uint8_t index, uint8_t adc) const;
+        uint32_t AdcChannel(Port port, uint8_t index) const;
 
         void EnableInterrupt(Port port, uint8_t index, const infra::Function<void()>& action, InterruptTrigger trigger);
         void DisableInterrupt(Port port, uint8_t index);
