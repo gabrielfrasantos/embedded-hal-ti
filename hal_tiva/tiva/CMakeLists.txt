@@ -37,8 +37,8 @@ target_sources(hal_tiva.tiva PRIVATE
     Reset.hpp
 #    SpiDataSizeConfiguratorStm.cpp
 #    SpiDataSizeConfiguratorStm.hpp
-#    SpiMasterStm.cpp
-#    SpiMasterStm.hpp
+    SpiMaster.cpp
+    SpiMaster.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.hpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.cpp>

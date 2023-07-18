@@ -2,6 +2,8 @@
     "files.associations": {
         "stdint.h": "c",
         "array": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "functional": "cpp",
+        "string_view": "cpp"
     }
 }

@@ -1,6 +1,6 @@
 #include "hal_tiva/tiva/UniqueDeviceId.hpp"
 
-namespace hal
+namespace hal::tiva
 {
     infra::ConstByteRange UniqueDeviceId()
     {

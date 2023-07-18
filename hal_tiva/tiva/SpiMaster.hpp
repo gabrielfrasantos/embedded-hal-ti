@@ -1,15 +1,15 @@
-#ifndef HAL_SPI_MASTER_STM_HPP
-#define HAL_SPI_MASTER_STM_HPP
+#ifndef HAL_SPI_MASTER_TIVA_HPP
+#define HAL_SPI_MASTER_TIVA_HPP
 
 #include "hal/interfaces/Spi.hpp"
 #include "hal_tiva/cortex/InterruptCortex.hpp"
-#include "hal_tiva/tiva/GpioStm.hpp"
+#include "hal_tiva/tiva/Gpio.hpp"
 #include "infra/util/AutoResetFunction.hpp"
 
-namespace hal
+namespace hal::tiva
 {
-    class SpiMasterStm
-        : public SpiMaster
+    class SpiMaster
+        : public hal::SpiMaster
     {
     public:
         struct Config
@@ -17,13 +17,13 @@ namespace hal
             constexpr Config()
             {}
 
-            bool msbFirst = true;
             bool polarityLow = true;
             bool phase1st = true;
-            uint32_t baudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+            uint32_t baudRate = 100000;
         };
 
-        SpiMasterStm(uint8_t oneBasedSpiIndex, GpioPinStm& clock, GpioPinStm& miso, GpioPinStm& mosi, const Config& config = Config(), GpioPinStm& slaveSelect = dummyPinStm);
+        SpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config = Config(), GpioPin& slaveSelect = dummyPin);
+        ~SpiMaster();
 
         virtual void SendAndReceive(infra::ConstByteRange sendData, infra::ByteRange receiveData, SpiAction nextAction, const infra::Function<void()>& onDone) override;
         virtual void SetChipSelectConfigurator(ChipSelectConfigurator& configurator) override;
@@ -32,13 +32,18 @@ namespace hal
 
     private:
         void HandleInterrupt();
+        void EnableClock();
+        void DisableClock();
 
     private:
-        uint8_t spiInstance;
-        PeripheralPinStm clock;
-        PeripheralPinStm miso;
-        PeripheralPinStm mosi;
-        PeripheralPinStm slaveSelect;
+        uint8_t ssiIndex;
+        PeripheralPin clock;
+        PeripheralPin miso;
+        PeripheralPin mosi;
+        PeripheralPin slaveSelect;
+
+        infra::MemoryRange<SSI0_Type* const> ssiArray;
+        infra::MemoryRange<IRQn_Type const> irqArray;
 
         infra::AutoResetFunction<void()> onDone;
         ChipSelectConfigurator* chipSelectConfigurator = nullptr;

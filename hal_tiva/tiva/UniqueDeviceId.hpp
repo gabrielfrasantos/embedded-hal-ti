@@ -3,7 +3,7 @@
 
 #include "infra/util/ByteRange.hpp"
 
-namespace hal
+namespace hal::tiva
 {
     infra::ConstByteRange UniqueDeviceId();
 }
