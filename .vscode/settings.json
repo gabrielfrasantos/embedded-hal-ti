@@ -4,6 +4,7 @@
         "array": "cpp",
         "type_traits": "cpp",
         "functional": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "chrono": "cpp"
     }
 }

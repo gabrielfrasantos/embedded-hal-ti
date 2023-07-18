@@ -142,33 +142,6 @@ namespace hal::tiva
         irqArray = infra::MakeRange(peripheralIrqSsiArray);
 
         EnableClock();
-/*        EnableClockSpi(ssiIndex);
-
-        SPI_HandleTypeDef spiHandle;
-        spiHandle.Instance = peripheralSpi[ssiIndex];
-        spiHandle.Init.Mode = SPI_MODE_MASTER;
-        spiHandle.Init.Direction = SPI_DIRECTION_2LINES;
-        spiHandle.Init.DataSize = SPI_DATASIZE_8BIT;
-        spiHandle.Init.CLKPolarity = config.polarityLow ? SPI_POLARITY_LOW : SPI_POLARITY_HIGH;
-        spiHandle.Init.CLKPhase = config.phase1st ? SPI_PHASE_1EDGE : SPI_PHASE_2EDGE;
-        spiHandle.Init.NSS = SPI_NSS_SOFT;
-        spiHandle.Init.BaudRatePrescaler = config.baudRatePrescaler;
-        spiHandle.Init.FirstBit = config.msbFirst ? SPI_FIRSTBIT_MSB : SPI_FIRSTBIT_LSB;
-        spiHandle.Init.TIMode = SPI_TIMODE_DISABLED;
-        spiHandle.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
-        spiHandle.Init.CRCPolynomial = 1;
-#if defined(STM32F0) || defined(STM32F1) || defined(STM32F3) || defined(STM32F7) || defined(STM32WB)
-        spiHandle.Init.CRCLength = SPI_CRC_LENGTH_8BIT;
-        spiHandle.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
-#endif
-        HAL_SPI_Init(&spiHandle);
-
-#if defined(STM32F0) || defined(STM32F1) || defined(STM32F3) || defined(STM32F7)
-        peripheralSpi[ssiIndex]->CR2 |= SPI_RXFIFO_THRESHOLD_QF;
-#endif
-
-        __HAL_SPI_ENABLE(&spiHandle);*/
-
         ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_SSE; /* Disable SPI */
 
         auto max = SystemCoreClock / config.baudRate;
@@ -191,11 +164,11 @@ namespace hal::tiva
         ssiArray[ssiIndex]->CPSR = (ssiArray[ssiIndex]->CPSR & ~SSI_CPSR_CPSDVSR_M) | div; /* Sets prescaler */
 
         ssiArray[ssiIndex]->CR1 |= SSI_CR1_SSE; /* Enable SPI */
-
     }
 
     SpiMaster::~SpiMaster()
     {
+        ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_SSE; /* Disable SPI */
         DisableClock();
     }
 

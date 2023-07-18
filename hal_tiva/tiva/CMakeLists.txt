@@ -33,6 +33,8 @@ target_sources(hal_tiva.tiva PRIVATE
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.hpp>
     PinoutTableDefault.cpp
     PinoutTableDefault.hpp
+    QuadratureEncoder.cpp
+    QuadratureEncoder.hpp
     Reset.cpp
     Reset.hpp
 #    SpiDataSizeConfiguratorStm.cpp
