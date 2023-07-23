@@ -4,7 +4,7 @@
 #include "hal_tiva/cortex/InterruptCortex.hpp"
 #include "infra/timer/Timer.hpp"
 
-namespace hal
+namespace hal::cortex
 {
     class SystemTick
         : private InterruptHandler

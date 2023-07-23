@@ -3,7 +3,7 @@
 
 #include "hal/interfaces/Reset.hpp"
 
-namespace hal::tiva
+namespace hal::cortex
 {
     class Reset
         : public hal::Reset

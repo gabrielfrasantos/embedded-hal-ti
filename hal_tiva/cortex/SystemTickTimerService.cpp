@@ -1,10 +1,10 @@
-#include "hal_tiva/tiva/SystemTickTimerService.hpp"
+#include "hal_tiva/cortex/SystemTickTimerService.hpp"
 #include DEVICE_HEADER
 #include "hal/interfaces/Gpio.hpp"
 
 extern uint32_t SystemCoreClock;
 
-namespace hal
+namespace hal::cortex
 {
     SystemTickTimerService::SystemTickTimerService(infra::Duration tickDuration, uint32_t id)
         : infra::TickOnInterruptTimerService(id, tickDuration)

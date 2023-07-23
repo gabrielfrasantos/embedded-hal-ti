@@ -7,13 +7,22 @@ target_include_directories(hal_tiva.cortex PUBLIC
 )
 
 target_link_libraries(hal_tiva.cortex PUBLIC
+    hal.interfaces
     ti.hal_driver
     infra.event
 )
 
 target_sources(hal_tiva.cortex PRIVATE
     EventDispatcherCortex.cpp
-    InterruptCortex.cpp
     EventDispatcherCortex.hpp
+    InterruptCortex.cpp
     InterruptCortex.hpp
+    Reset.cpp
+    Reset.hpp
+    SystemTick.cpp
+    SystemTick.hpp
+    SystemTickTimerService.cpp
+    SystemTickTimerService.hpp
+    TimeKeeper.cpp
+    TimeKeeper.hpp
 )

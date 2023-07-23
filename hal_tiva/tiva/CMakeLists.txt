@@ -37,8 +37,6 @@ target_sources(hal_tiva.tiva PRIVATE
     Pwm.hpp
     QuadratureEncoder.cpp
     QuadratureEncoder.hpp
-    Reset.cpp
-    Reset.hpp
 #    SpiDataSizeConfiguratorStm.cpp
 #    SpiDataSizeConfiguratorStm.hpp
     SpiMaster.cpp
@@ -47,10 +45,6 @@ target_sources(hal_tiva.tiva PRIVATE
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.hpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.cpp>
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.hpp>
-    SystemTick.cpp
-    SystemTick.hpp
-    SystemTickTimerService.cpp
-    SystemTickTimerService.hpp
     Uart.cpp
     Uart.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStmDma.cpp>

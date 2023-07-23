@@ -13,16 +13,12 @@ target_link_libraries(hal_tiva.synchronous_tiva PUBLIC
 )
 
 target_sources(hal_tiva.synchronous_tiva PRIVATE
-    Dummy.hpp
-    Dummy.cpp
 #    SynchronousGpioStm.cpp
 #    SynchronousGpioStm.hpp
 #    SynchronousFlashInternalStm.cpp
 #    SynchronousFlashInternalStm.hpp
 #    SynchronousSpiMasterStm.cpp
 #    SynchronousSpiMasterStm.hpp
-#    SynchronousUartStm.cpp
-#    SynchronousUartStm.hpp
-#    TimeKeeperStm.cpp
-#    TimeKeeperStm.hpp
+    SynchronousUart.cpp
+    SynchronousUart.hpp
 )

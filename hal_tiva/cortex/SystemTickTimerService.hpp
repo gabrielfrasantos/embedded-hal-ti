@@ -5,7 +5,7 @@
 #include "infra/timer/TickOnInterruptTimerService.hpp"
 #include "infra/util/InterfaceConnector.hpp"
 
-namespace hal
+namespace hal::cortex
 {
     class SystemTickTimerService
         : public infra::InterfaceConnector<SystemTickTimerService>

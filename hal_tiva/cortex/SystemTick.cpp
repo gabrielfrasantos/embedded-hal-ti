@@ -1,7 +1,7 @@
-#include "hal_tiva/tiva/SystemTick.hpp"
+#include "hal_tiva/cortex/SystemTick.hpp"
 #include DEVICE_HEADER
 
-namespace hal
+namespace hal::cortex
 {
     SystemTick::SystemTick(const infra::Function<void()>& callback, infra::Duration tickDuration)
         : callback(callback)
