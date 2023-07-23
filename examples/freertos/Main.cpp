@@ -29,8 +29,6 @@ extern "C" [[gnu::naked]] void SysTick_Handler()
     asm("b xPortSysTickHandler");
 };
 
-unsigned int hse_value = 8000000;
-
 int main()
 {
     HAL_Init();

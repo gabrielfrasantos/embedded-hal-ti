@@ -33,12 +33,12 @@
 // Forward declaration of the default fault handlers.
 //
 //*****************************************************************************
-static void Default_Handler();
-static void Reset_Handler();
 extern void Default_Handler_Forwarded();
-void SVC_Handler() __attribute__((weak, alias("DefaultInternal_Handler")));
-void PendSV_Handler() __attribute__((weak, alias("DefaultInternal_Handler")));
-void SysTick_Handler() __attribute__((weak, alias("DefaultInternal_Handler")));
+static void Default_Handler();
+void Reset_Handler();
+void SVC_Handler() __attribute__((weak, alias("Default_Handler")));
+void PendSV_Handler() __attribute__((weak, alias("Default_Handler")));
+void SysTick_Handler() __attribute__((weak, alias("Default_Handler")));
 
 //*****************************************************************************
 //
@@ -56,6 +56,7 @@ extern void (*__init_array_start[])();
 extern void (*__init_array_end[])();
 extern void _init(void);
 extern void HardwareInitialization();
+extern int main();
 
 //*****************************************************************************
 //
@@ -256,7 +257,7 @@ extern uint32_t _ebss;
 // application.
 //
 //*****************************************************************************
-static void Reset_Handler()
+void Reset_Handler()
 {
     uint32_t *pui32Src, *pui32Dest;
 
@@ -305,7 +306,7 @@ static void Reset_Handler()
     //
     // Call the hardware's initialization function.
     //
-    HardwareInitialization():
+    HardwareInitialization();
 
     //
     // Call the application's entry point.
@@ -338,7 +339,7 @@ void __libc_init_local(void)
 // for examination by a debugger.
 //
 //*****************************************************************************
-static void DefaultInternal()
+static void Default_Handler()
 {
     Default_Handler_Forwarded();
 }

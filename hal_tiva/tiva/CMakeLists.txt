@@ -10,7 +10,7 @@ target_include_directories(hal_tiva.tiva PUBLIC
 target_link_libraries(hal_tiva.tiva PUBLIC
     hal.interfaces
     infra.timer
-    st.hal_driver
+    ti.hal_driver
     hal_tiva.cortex
 )
 

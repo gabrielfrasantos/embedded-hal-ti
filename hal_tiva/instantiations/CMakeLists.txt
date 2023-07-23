@@ -15,14 +15,14 @@ target_link_libraries(hal_tiva.instantiations PUBLIC
 )
 
 target_sources(hal_tiva.instantiations PRIVATE
-    DiscoveryTracerInfrastructure.hpp
-    DiscoveryUi.hpp
-    NucleoTracerInfrastructure.hpp
-    NucleoUi.hpp
-    StmEventInfrastructure.cpp
-    StmEventInfrastructure.hpp
-    StmTracerInfrastructure.cpp
-    StmTracerInfrastructure.hpp
+    #DiscoveryTracerInfrastructure.hpp
+    #DiscoveryUi.hpp
+    #NucleoTracerInfrastructure.hpp
+    #NucleoUi.hpp
+    #StmEventInfrastructure.cpp
+    #StmEventInfrastructure.hpp
+    #StmTracerInfrastructure.cpp
+    #StmTracerInfrastructure.hpp
     TracingResetStm.cpp
     TracingResetStm.hpp
 )

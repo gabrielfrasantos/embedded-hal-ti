@@ -1,7 +1,12 @@
+PROVIDE(_Heap_Begin = end);
+PROVIDE(_Heap_Limit = _estack - __Main_Stack_Size);
+
+__Main_Stack_Size = 1024;
+
 ENTRY(Reset_Handler)
 
-REGION_ALIAS("REGION_TEXT", flash);
-REGION_ALIAS("REGION_RAM", ram);
+REGION_ALIAS("REGION_TEXT", FLASH);
+REGION_ALIAS("REGION_RAM", RAM);
 
 SECTIONS
 {

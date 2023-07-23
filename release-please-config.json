@@ -4,7 +4,7 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "amp-hal-st",
+      "package-name": "embedded-hal-ti",
       "extra-files": [
         "CMakeLists.txt"
       ]

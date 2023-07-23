@@ -60,6 +60,8 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "tiva.h": "c",
+        "tm4c123gh6zxr.h": "c"
     }
 }
