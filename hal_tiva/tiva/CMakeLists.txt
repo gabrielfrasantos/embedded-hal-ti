@@ -19,8 +19,8 @@ target_sources(hal_tiva.tiva PRIVATE
 #    AnalogToDigitalPinStm.hpp
 #    CanStm.cpp
 #    CanStm.hpp
-    $<$<STREQUAL:${TARGET_MCU},tm4c123gh6pm>:DefaultClockEkTm4c123gxl.cpp>
-    $<$<STREQUAL:${TARGET_MCU},tm4c123gh6pm>:DefaultClockEkTm4c123gxl.hpp>
+    Clock.cpp
+    Clock.hpp
 #    DigitalToAnalogPinStm.cpp
 #    DigitalToAnalogPinStm.hpp
 #    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:DmaStm.cpp>

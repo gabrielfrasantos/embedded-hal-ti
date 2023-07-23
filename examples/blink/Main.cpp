@@ -2,6 +2,7 @@
 //#include "hal_tiva/instantiations/StmEventInfrastructure.hpp"
 // #include "hal_tiva/tiva/DefaultClockNucleoF767ZI.hpp"
 #include "services/util/DebugLed.hpp"
+#include "hal_tiva/tiva/Clock.hpp"
 
 int main()
 {
