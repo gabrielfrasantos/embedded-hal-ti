@@ -16,17 +16,6 @@ namespace hal::tiva
     public:
         struct Config
         {
-            enum class UnitClockDivisor
-            {
-                _1,
-                _2,
-                _4,
-                _8,
-                _16,
-                _32,
-                _64,
-            };
-
             struct Control
             {
                 enum class Mode
@@ -97,7 +86,6 @@ namespace hal::tiva
             constexpr Config()
             {}
 
-            UnitClockDivisor unitClockDivisor = UnitClockDivisor::_64;
             bool channelAInverted = false;
             bool channelBInverted = false;
             Control control;
@@ -204,9 +192,12 @@ namespace hal::tiva
 
     private:
         void Configure(const PeripheralChannels& channel);
+        void Reset();
+        void MasterControl();
+        void SetClockPrescaler(uint32_t frequency);
         void SetBaseFrequency();
         void HandleInterrupt();
-        void EnableClock(Config::UnitClockDivisor divisor);
+        void EnableClock();
         void DisableClock();
     };
 }

@@ -282,15 +282,21 @@ namespace hal::tiva
         constexpr const uint32_t SYSCTL_RCC_PWMDIV_32 = 0x00080000;  // PWM clock /32
         constexpr const uint32_t SYSCTL_RCC_PWMDIV_64 = 0x000A0000;  // PWM clock /64
 
-        const std::array<uint32_t, 6> peripheralRccPwmDiv =
-        {{
-            SYSCTL_RCC_PWMDIV_2,
-            SYSCTL_RCC_PWMDIV_4,
-            SYSCTL_RCC_PWMDIV_8,
-            SYSCTL_RCC_PWMDIV_16,
-            SYSCTL_RCC_PWMDIV_32,
-            SYSCTL_RCC_PWMDIV_64,
-        }};
+        constexpr uint32_t ToRccPwmDiv(uint32_t multiplyFactor)
+        {
+            really_assert(multiplyFactor >= 2 && multiplyFactor <= 64 && multiplyFactor % 2 == 0);
+
+            switch (multiplyFactor)
+            {
+                case 2: return SYSCTL_RCC_PWMDIV_2; break;
+                case 4: return SYSCTL_RCC_PWMDIV_4; break;
+                case 8: return SYSCTL_RCC_PWMDIV_8; break;
+                case 16: return SYSCTL_RCC_PWMDIV_16; break;
+                case 32: return SYSCTL_RCC_PWMDIV_32; break;
+                case 64: return SYSCTL_RCC_PWMDIV_64; break;
+                default: std::abort();
+            }
+        }
 
         constexpr std::array<uint32_t, 2> peripheralPwmArray =
         {{
@@ -324,9 +330,7 @@ namespace hal::tiva
         channels.emplace_back(channel2, PinConfigPeripheral::pwmChannel4, PinConfigPeripheral::pwmChannel5, peripheralPwmArray[pwmIndex], 2);
         channels.emplace_back(channel3, PinConfigPeripheral::pwmChannel6, PinConfigPeripheral::pwmChannel6, peripheralPwmArray[pwmIndex], 3);
 
-        EnableClock(config.unitClockDivisor);
-
-        peripheralFrequency = SystemCoreClock /  (1 << static_cast<uint32_t>(config.unitClockDivisor));
+        EnableClock();
     }
 
     Pwm::~Pwm()
@@ -353,17 +357,12 @@ namespace hal::tiva
     {
         really_assert(globalDutyCycle < 100);
 
-        SYSCTL->SRPWM |= 1 << pwmIndex;
-        while (!infra::IsBitSet(SYSCTL->PRPWM, pwmIndex))
-        {
-        }
-
-        pwmArray[pwmIndex]->CTL = PWM_CTL_GLOBALSYNC3 | PWM_CTL_GLOBALSYNC2 | PWM_CTL_GLOBALSYNC1 | PWM_CTL_GLOBALSYNC0;
-        pwmArray[pwmIndex]->SYNC = PWM_SYNC_SYNC3 | PWM_SYNC_SYNC2 | PWM_SYNC_SYNC1 | PWM_SYNC_SYNC0;
+        Reset();
+        MasterControl();
         
         for (auto& channel : channels)
         {
-            channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE; // Ensure channel is disabled
+            channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE;
 
             Configure(channel);
 
@@ -380,7 +379,10 @@ namespace hal::tiva
 
     void Pwm::Stop()
     {
-
+        for (auto& channel : channels)
+        {
+            channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE;
+        }
     }
 
     void Pwm::DeadTime(uint8_t deadTime)
@@ -424,19 +426,54 @@ namespace hal::tiva
             peripheralPwm[pwmIndex]->ENABLE |= channel.enable;
         }
     }
+    
+    void Pwm::Reset()
+    {
+        SYSCTL->SRPWM |= 1 << pwmIndex;
+        while (!infra::IsBitSet(SYSCTL->PRPWM, pwmIndex))
+        {
+        }
+    }
 
-    void Pwm::EnableClock(Config::UnitClockDivisor divisor)
+    void Pwm::MasterControl()
+    {
+        pwmArray[pwmIndex]->CTL = PWM_CTL_GLOBALSYNC3 | PWM_CTL_GLOBALSYNC2 | PWM_CTL_GLOBALSYNC1 | PWM_CTL_GLOBALSYNC0;
+        pwmArray[pwmIndex]->SYNC = PWM_SYNC_SYNC3 | PWM_SYNC_SYNC2 | PWM_SYNC_SYNC1 | PWM_SYNC_SYNC0;
+        //pwmArray[pwmIndex]->ENUPD = ;
+    }
+
+    void Pwm::SetClockPrescaler(uint32_t frequency)
+    {
+        uint32_t divisor = 1;
+        peripheralFrequency = SystemCoreClock;
+        really_assert(frequency > (SystemCoreClock / 2));
+
+        SYSCTL->RCC = (SYSCTL->RCC & ~(SYSCTL_RCC_PWMDIV_M | SYSCTL_RCC_USEPWMDIV));
+
+        bool needToFixClock = frequency < (peripheralFrequency / 0xffff);
+
+        while (needToFixClock)
+        {
+            divisor *= 2;
+            peripheralFrequency /= divisor;
+
+            really_assert(divisor <= 64);
+
+            if (frequency < (peripheralFrequency / 0xffff))
+                break;
+        }
+
+        if (needToFixClock)
+            SYSCTL->RCC |= SYSCTL_RCC_USEPWMDIV | ToRccPwmDiv(divisor);
+    }
+
+    void Pwm::EnableClock()
     {
         infra::ReplaceBit(SYSCTL->RCGCPWM, true, pwmIndex);
 
         while (!infra::IsBitSet(SYSCTL->PRPWM, pwmIndex))
         {
         }
-
-        SYSCTL->RCC = (SYSCTL->RCC & ~(SYSCTL_RCC_PWMDIV_M | SYSCTL_RCC_USEPWMDIV));
-
-        if (divisor != Config::UnitClockDivisor::_1)
-            SYSCTL->RCC |= SYSCTL_RCC_USEPWMDIV | peripheralRccPwmDiv[static_cast<uint8_t>(divisor) - 1];
     }
 
     void Pwm::DisableClock()
