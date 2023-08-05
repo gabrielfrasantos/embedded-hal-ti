@@ -223,8 +223,6 @@ namespace hal::tiva
         void ReservePin(Port port, uint8_t index);
         void ClearPinReservation(Port port, uint8_t index);
 
-        static constexpr uint32_t registerSize = 4;
-
     private:
         void ExtiInterrupt(GPIOA_Type* gpio, std::size_t from, std::size_t to);
 

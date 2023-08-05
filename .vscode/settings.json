@@ -1,15 +1,20 @@
 {
+    "cortex-debug.openocdPath.linux": "/usr/bin/openocd",
+    "cortex-debug.armToolchainPath.linux": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin",
+    "cortex-debug.gdbPath.linux": "/opt/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gdb",
+    
+    "cortex-debug.openocdPath.windows": "C:\\Program Files\\openocd\\bin\\openocd.exe",
+    "cortex-debug.armToolchainPath.windows": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin",
+    "cortex-debug.gdbPath.windows": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
+    "cortex-debug.JLinkGDBServerPath.windows": "C:\\Program Files (x86)\\SEGGER\\JLink\\JLinkGDBServerCL.exe",
+    "cortex-debug.variableUseNaturalFormat": true,
     "files.associations": {
-        "stdint.h": "c",
         "array": "cpp",
-        "type_traits": "cpp",
-        "functional": "cpp",
-        "string_view": "cpp",
-        "chrono": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
         "*.tcc": "cpp",
         "cctype": "cpp",
+        "chrono": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
         "codecvt": "cpp",
@@ -32,6 +37,7 @@
         "vector": "cpp",
         "exception": "cpp",
         "algorithm": "cpp",
+        "functional": "cpp",
         "iterator": "cpp",
         "memory": "cpp",
         "memory_resource": "cpp",
@@ -40,10 +46,11 @@
         "random": "cpp",
         "ratio": "cpp",
         "string": "cpp",
+        "string_view": "cpp",
         "system_error": "cpp",
         "tuple": "cpp",
+        "type_traits": "cpp",
         "utility": "cpp",
-        "fstream": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
         "iosfwd": "cpp",
@@ -60,8 +67,6 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp",
-        "tiva.h": "c",
-        "tm4c123gh6zxr.h": "c"
+        "typeinfo": "cpp"
     }
 }

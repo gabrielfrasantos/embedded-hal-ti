@@ -49,25 +49,25 @@ namespace hal::tiva
         };
 
         // clang-format off
-        const std::array<Peripheral, 8> portAndRcgc {{
-            { GPIOA, 0x01, }, // NOLINT
-            { GPIOB, 0x02, }, // NOLINT
-            { GPIOC, 0x04, }, // NOLINT
-            { GPIOD, 0x08, }, // NOLINT
-            { GPIOE, 0x10, }, // NOLINT
-            { GPIOF, 0x20, }, // NOLINT
+        const std::array<Peripheral, 6> portAndRcgc {{
+            { GPIOA, 0x01, },
+            { GPIOB, 0x02, },
+            { GPIOC, 0x04, },
+            { GPIOD, 0x08, },
+            { GPIOE, 0x10, },
+            { GPIOF, 0x20, },
         }};
 
         const std::array<PushPull, 4> pushPullTiva{ {
-            { false, true, false },     /* UP */
-            { false, false, true },     /* DOWN */
-            { true, false, false },     /* Open drain */
-            { false, false, false },    /* Disable */
+            { false, true, false },     /* up */
+            { false, false, true },     /* down */
+            { true, false, false },     /* open drain */
+            { false, false, false },    /* disable */
         } };
 
         const std::array<Mode, 4> modeTiva{ {
-            { true, false, true },      /* in */
-            { true, false, false },     /* out */
+            { true, false, false },      /* in */
+            { true, false, true },     /* out */
             { false, false, false },    /* alternate */
             { false, true, true },      /* analog */
         } };
@@ -80,9 +80,9 @@ namespace hal::tiva
         } };
 
         const std::array<Interrupt, 4> interruptTiva{ {
-            { false, false, true },     /* RISING */
-            { false, false, false },    /* FALLING */
-            { true, false, false },     /* BOTH */
+            { false, false, true },     /* rising */
+            { false, false, false },    /* falling */
+            { true, false, false },     /* both */
             { false, false, false },    /* none */
         } };
 
@@ -107,6 +107,17 @@ namespace hal::tiva
         {
             return portAndRcgc[static_cast<uint8_t>(port)].rcgc;
         }
+
+        constexpr uint32_t ToPin(uint8_t index)
+        {
+            return 1 << index;
+        }
+
+        template<class T> 
+        constexpr bool GetBit(T& reg, uint32_t position)
+        {
+            return reg & (1 << position);
+        }
     }
 
     DummyPin dummyPin;
@@ -117,17 +128,17 @@ namespace hal::tiva
         , drive(drive)
         , current(current)
     { 
-        SYSCTL->RCGCGPIO = SYSCTL->RCGCGPIO | Rcgc(port); // NOLINT
+        SYSCTL->RCGCGPIO = SYSCTL->RCGCGPIO | Rcgc(port);
 
-        while (!(SYSCTL->PRGPIO & Rcgc(port))) //NOLINT
+        while (!(SYSCTL->PRGPIO & Rcgc(port)))
         {
         }
 
         if (((GpioTiva(port) == GPIOF) && (index == 0)) || 
-            ((GpioTiva(port) == GPIOD) && (index == 7))) // NOLINT
+            ((GpioTiva(port) == GPIOD) && (index == 7)))
         {
             GpioTiva(port)->LOCK = 0x4C4F434B;
-            infra::ReplaceBits(GpioTiva(port)->CR, Gpio::registerSize, 1, index);
+            infra::ReplaceBit(GpioTiva(port)->CR, false, index);
             GpioTiva(port)->LOCK = 0;
         }
     }
@@ -139,7 +150,7 @@ namespace hal::tiva
 
     void GpioPin::Set(bool value)
     {
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, value, index);
+        infra::ReplaceBit(GpioTiva(port)->DATA, value, index);
     }
 
     bool GpioPin::GetOutputLatch() const
@@ -149,76 +160,60 @@ namespace hal::tiva
 
     void GpioPin::SetAsInput()
     {
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, 1, index);
+        infra::ReplaceBit(GpioTiva(port)->DIR, true, index);
     }
 
     bool GpioPin::IsInput() const
     {
-        return infra::GetBits(GpioTiva(port)->DIR, Gpio::registerSize, index) == 0;
+        return GetBit(GpioTiva(port)->DIR, index) == 0;
     }
 
     void GpioPin::Config(PinConfigType config)
     {
-        assert(config != PinConfigType::output); // Use Config(_, startOutputState) for outputs
-
         Gpio::Instance().ReservePin(port, index);
 
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].dir, index);
-        infra::ReplaceBits(GpioTiva(port)->DEN, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].den, index);
-        infra::ReplaceBits(GpioTiva(port)->AMSEL, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].amsel, index);
+        auto gpio = GpioTiva(port);
 
-        infra::ReplaceBits(GpioTiva(port)->PUR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-        infra::ReplaceBits(GpioTiva(port)->PDR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-        infra::ReplaceBits(GpioTiva(port)->ODR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
+        infra::ReplaceBit(GpioTiva(port)->DIR, modeTiva[static_cast<uint8_t>(config)].dir, index);
+        infra::ReplaceBit(GpioTiva(port)->AFSEL, false, index);
+        infra::ReplaceBit(GpioTiva(port)->DR2R, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
+        infra::ReplaceBit(GpioTiva(port)->DR4R, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, index);
+        infra::ReplaceBit(GpioTiva(port)->DR8R, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
 
-        infra::ReplaceBits(GpioTiva(port)->AFSEL, Gpio::registerSize, 0, index);
-        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0);
+        infra::ReplaceBit(GpioTiva(port)->DEN, modeTiva[static_cast<uint8_t>(config)].den, index);
+        infra::ReplaceBit(GpioTiva(port)->AMSEL, modeTiva[static_cast<uint8_t>(config)].amsel, index);
 
-        infra::ReplaceBits(GpioTiva(port)->DR2R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
-        infra::ReplaceBits(GpioTiva(port)->DR4R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, index);
-        infra::ReplaceBits(GpioTiva(port)->DR8R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
+        infra::ReplaceBit(GpioTiva(port)->PUR, pushPullTiva[static_cast<uint8_t>(drive)].pur, index);
+        infra::ReplaceBit(GpioTiva(port)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, index);
+        infra::ReplaceBit(GpioTiva(port)->ODR, pushPullTiva[static_cast<uint8_t>(drive)].odr, index);
+
+        //infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0);
     }
 
     void GpioPin::Config(PinConfigType config, bool startOutputState)
     {
-        assert(config != PinConfigType::input);
+        Config(config);
 
-        Gpio::Instance().ReservePin(port, index);
-
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].dir, index);
-        infra::ReplaceBits(GpioTiva(port)->DEN, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].den, index);
-        infra::ReplaceBits(GpioTiva(port)->AMSEL, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].amsel, index);
-
-        infra::ReplaceBits(GpioTiva(port)->PUR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-        infra::ReplaceBits(GpioTiva(port)->PDR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-        infra::ReplaceBits(GpioTiva(port)->ODR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-
-        infra::ReplaceBits(GpioTiva(port)->AFSEL, Gpio::registerSize, 0, index);
-        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0);
-
-        infra::ReplaceBits(GpioTiva(port)->DR2R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
-        infra::ReplaceBits(GpioTiva(port)->DR4R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, index);
-        infra::ReplaceBits(GpioTiva(port)->DR8R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
-
-        Set(startOutputState);
+        if (config != PinConfigType::input)
+            Set(startOutputState);
     }
 
     void GpioPin::ResetConfig()
     {
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, true, index);
-        infra::ReplaceBits(GpioTiva(port)->DEN, Gpio::registerSize, true, index);
-        infra::ReplaceBits(GpioTiva(port)->AMSEL, Gpio::registerSize, false, index);
+        infra::ReplaceBit(GpioTiva(port)->DIR, true, index);
+        infra::ReplaceBit(GpioTiva(port)->DEN, true, index);
+        infra::ReplaceBit(GpioTiva(port)->AMSEL, false, index);
 
-        infra::ReplaceBits(GpioTiva(port)->PUR, Gpio::registerSize, false, index);
-        infra::ReplaceBits(GpioTiva(port)->PDR, Gpio::registerSize, false, index);
-        infra::ReplaceBits(GpioTiva(port)->ODR, Gpio::registerSize, false, index);
+        infra::ReplaceBit(GpioTiva(port)->PUR, false, index);
+        infra::ReplaceBit(GpioTiva(port)->PDR, false, index);
+        infra::ReplaceBit(GpioTiva(port)->ODR, false, index);
 
-        infra::ReplaceBits(GpioTiva(port)->AFSEL, Gpio::registerSize, 0, index);
+        infra::ReplaceBit(GpioTiva(port)->AFSEL, false, index);
         infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0);
 
-        infra::ReplaceBits(GpioTiva(port)->DR2R, Gpio::registerSize, true, index);
-        infra::ReplaceBits(GpioTiva(port)->DR4R, Gpio::registerSize, false, index);
-        infra::ReplaceBits(GpioTiva(port)->DR8R, Gpio::registerSize, false, index);
+        infra::ReplaceBit(GpioTiva(port)->DR2R, true, index);
+        infra::ReplaceBit(GpioTiva(port)->DR4R, false, index);
+        infra::ReplaceBit(GpioTiva(port)->DR8R, false, index);
 
         Gpio::Instance().ClearPinReservation(port, index);
     }
@@ -237,9 +232,9 @@ namespace hal::tiva
     {
         Gpio::Instance().ReservePin(port, index);
 
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, true, index);
-        infra::ReplaceBits(GpioTiva(port)->DEN, Gpio::registerSize, false, index);
-        infra::ReplaceBits(GpioTiva(port)->AMSEL, Gpio::registerSize, true, index);
+        infra::ReplaceBit(GpioTiva(port)->DIR, true, index);
+        infra::ReplaceBit(GpioTiva(port)->DEN, false, index);
+        infra::ReplaceBit(GpioTiva(port)->AMSEL, true, index);
     }
 
     void GpioPin::ConfigPeripheral(PinConfigPeripheral pinConfigType)
@@ -252,23 +247,22 @@ namespace hal::tiva
         Drive drive = peripheralPinConfig.second.drive;
         Current current = peripheralPinConfig.second.current;
 
-        // Peripherals use the weakpull, drive, and current from the peripheral's definition
+        // TODO Peripherals use the weakpull, drive, and current from the peripheral's definition
+
 #if 0
-        infra::ReplaceBits(GpioTiva(port)->DIR, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].dir, index);
-        infra::ReplaceBits(GpioTiva(port)->DEN, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].den, index);
-        infra::ReplaceBits(GpioTiva(port)->AMSEL, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].amsel, index);
+        infra::ReplaceBit(GpioTiva(port)->DIR, modeTiva[static_cast<uint8_t>(config)].dir, index);
+        infra::ReplaceBit(GpioTiva(port)->DEN, modeTiva[static_cast<uint8_t>(config)].den, index);
+        infra::ReplaceBit(GpioTiva(port)->AMSEL, modeTiva[static_cast<uint8_t>(config)].amsel, index);
 #endif
 
-        infra::ReplaceBits(GpioTiva(port)->PUR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-        infra::ReplaceBits(GpioTiva(port)->PDR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
-        infra::ReplaceBits(GpioTiva(port)->ODR, Gpio::registerSize, static_cast<uint8_t>(drive), index);
+        infra::ReplaceBit(GpioTiva(port)->AFSEL, false, index);
+        infra::ReplaceBit(GpioTiva(port)->DR2R, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
+        infra::ReplaceBit(GpioTiva(port)->DR4R, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, index);
+        infra::ReplaceBit(GpioTiva(port)->DR8R, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
 
-        infra::ReplaceBits(GpioTiva(port)->AFSEL, Gpio::registerSize, true, index);
-        infra::MaskedUpdate(GpioTiva(port)->PCTL, pinTiva[index].mask, portControl);
-
-        infra::ReplaceBits(GpioTiva(port)->DR2R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
-        infra::ReplaceBits(GpioTiva(port)->DR4R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, index);
-        infra::ReplaceBits(GpioTiva(port)->DR8R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
+        infra::ReplaceBit(GpioTiva(port)->PUR, pushPullTiva[static_cast<uint8_t>(drive)].pur, index);
+        infra::ReplaceBit(GpioTiva(port)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, index);
+        infra::ReplaceBit(GpioTiva(port)->ODR, pushPullTiva[static_cast<uint8_t>(drive)].odr, index);
     }
 
     uint32_t GpioPin::AdcChannel() const
@@ -366,7 +360,7 @@ namespace hal::tiva
                 ((GpioTiva(portAndIndex.first) == GPIOD) && (portAndIndex.second == 7))) // NOLINT
             {
                 GpioTiva(portAndIndex.first)->LOCK = 0x4C4F434B;
-                infra::ReplaceBits(GpioTiva(portAndIndex.first)->CR, Gpio::registerSize, true, portAndIndex.second);
+                infra::ReplaceBit(GpioTiva(portAndIndex.first)->CR, true, portAndIndex.second);
                 GpioTiva(portAndIndex.first)->LOCK = 0;
             }
         }
@@ -376,20 +370,20 @@ namespace hal::tiva
     {
         for (const std::pair<Port, uint8_t>& portAndIndex : table)
         {
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DIR, Gpio::registerSize, true, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DEN, Gpio::registerSize, true, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->AMSEL, Gpio::registerSize, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DIR, true, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DEN, true, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AMSEL, false, portAndIndex.second);
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->PUR, Gpio::registerSize, false, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->PDR, Gpio::registerSize, false, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->ODR, Gpio::registerSize, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->PUR, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->PDR, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->ODR, false, portAndIndex.second);
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->AFSEL, Gpio::registerSize, 0, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AFSEL, false, portAndIndex.second);
             infra::MaskedUpdate(GpioTiva(portAndIndex.first)->PCTL, ~pinTiva[portAndIndex.second].mask, 0);
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DR2R, Gpio::registerSize, true, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DR4R, Gpio::registerSize, false, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DR8R, Gpio::registerSize, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR2R, true, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR4R, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR8R, false, portAndIndex.second);
 
             Gpio::Instance().ClearPinReservation(portAndIndex.first, portAndIndex.second);
         }
@@ -401,9 +395,9 @@ namespace hal::tiva
         {
             Gpio::Instance().ReservePin(portAndIndex.first, portAndIndex.second);
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DIR, Gpio::registerSize, true, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DEN, Gpio::registerSize, false, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->AMSEL, Gpio::registerSize, true, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DIR, true, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DEN, false, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AMSEL, true, portAndIndex.second);
         }
     }
 
@@ -416,21 +410,21 @@ namespace hal::tiva
             Gpio::Instance().ReservePin(portAndIndex.first, portAndIndex.second);
 
 #if 0
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DIR, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].dir, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DEN, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].den, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->AMSEL, Gpio::registerSize, modeTiva[static_cast<uint8_t>(config)].amsel, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DIR, modeTiva[static_cast<uint8_t>(config)].dir, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DEN, modeTiva[static_cast<uint8_t>(config)].den, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AMSEL, modeTiva[static_cast<uint8_t>(config)].amsel, portAndIndex.second);
 #endif
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->PUR, Gpio::registerSize, static_cast<uint8_t>(drive), portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->PDR, Gpio::registerSize, static_cast<uint8_t>(drive), portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->ODR, Gpio::registerSize, static_cast<uint8_t>(drive), portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->PUR, pushPullTiva[static_cast<uint8_t>(drive)].pur, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->ODR, pushPullTiva[static_cast<uint8_t>(drive)].odr, portAndIndex.second);
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->AFSEL, Gpio::registerSize, true, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AFSEL, true, portAndIndex.second);
             infra::MaskedUpdate(GpioTiva(portAndIndex.first)->PCTL, pinTiva[portAndIndex.second].mask, peripheralPinConfig.first.portControl);
 
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DR2R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DR4R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, portAndIndex.second);
-            infra::ReplaceBits(GpioTiva(portAndIndex.first)->DR8R, Gpio::registerSize, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR2R, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR4R, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR8R, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, portAndIndex.second);
         }
     }
 

@@ -34,6 +34,7 @@
 //
 //*****************************************************************************
 extern void Default_Handler_Forwarded();
+extern void __libc_init_local();
 static void Default_Handler();
 void Reset_Handler();
 void SVC_Handler() __attribute__((weak, alias("Default_Handler")));
@@ -302,6 +303,11 @@ void Reset_Handler()
     SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2));
 
     __asm volatile("cpsie i");
+
+    //
+    // C/C++ objects, sections .fini, .fini_array and .dtors.
+    //
+    __libc_init_local();
 
     //
     // Call the hardware's initialization function.

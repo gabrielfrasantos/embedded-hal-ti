@@ -371,7 +371,7 @@ namespace
     {
         auto oscSourceReg = static_cast<uint32_t>(oscSource);
 
-        if ((rcc & SYSCTL_RCC_MOSCDIS_B) != 0 && (oscSourceReg & SYSCTL_MAIN_OSC_DIS_B) == 0)
+        if ((rcc & SYSCTL_RCC_MOSCDIS_B) && !(oscSourceReg & SYSCTL_MAIN_OSC_DIS_B))
         {
             rcc &= (~SYSCTL_RCC_MOSCDIS_B | (oscSourceReg & SYSCTL_MAIN_OSC_DIS_B));
             SYSCTL->MISC = SYSCTL_MISC_MOSCPUPMIS_B;
