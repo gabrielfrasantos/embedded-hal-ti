@@ -64,6 +64,10 @@ See the [changelog](CHANGELOG.md) for more info on what's been changed.
 
 Please refer to our [contributing](CONTRIBUTING.md) guide when you want to contribute to this project.
 
+## Examples
+
+In order to run the examples, please check the document [EK-TM4C123GXL](doc/EK-TM4C123GXL.md) first.
+
 ## License
 
 embedded-hal-ti is licensed under the [MIT](https://choosealicense.com/licenses/mit/) [license](LICENSE) except the files and/or directories named in the [notice](NOTICE) file.
