@@ -16,8 +16,8 @@ if (HAL_TI_STANDALONE)
 
     FetchContent_Declare(
         emil
-        GIT_REPOSITORY https://github.com/philips-software/amp-embedded-infra-lib.git
-        GIT_TAG        77eb4170285a16e31cae5aee6a96e792baea2aa7 # Unreleased
+        GIT_REPOSITORY https://github.com/gabrielfrasantos/embedded-hal-st.git
+        GIT_TAG        eee8b34099fcbfdcd1ff906a217a14e524686a95 # Unreleased
     )
 
     FetchContent_MakeAvailable(emil)
