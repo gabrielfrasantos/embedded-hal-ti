@@ -43,32 +43,36 @@ namespace hal::tiva
     constexpr std::array<const Gpio::PinoutTable, 4> pinoutTableUartArray =
     {{
         {
-            PinConfigPeripheral::uartTx,
+            PinConfigPeripheral::uartRx,
             pinoutTableUartRxPins,
             Drive::Up,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::uartTx,
             pinoutTableUartTxPins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::uartRts,
             pinoutTableUartRtsPins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::uartCts,
             pinoutTableUartCtsPins,
             Drive::Up,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         }
     }};
 
@@ -117,28 +121,32 @@ namespace hal::tiva
             pinoutTableSpiClkPins,
             Drive::None,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::spiSlaveSelect,
             pinoutTableSpiFssPins,
             Drive::None,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::spiMiso,
             pinoutTableSpiRxPins,
             Drive::None,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::spiMosi,
             pinoutTableSpiTxPins,
             Drive::None,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
     }};
 
@@ -167,14 +175,16 @@ namespace hal::tiva
             pinoutTableI2cSclPins,
             Drive::None,
             hal::PinConfigType::triState,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::i2cSda,
             pinoutTableI2cSdaPins,
             Drive::OpenDrain,
             hal::PinConfigType::triState,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
     }};
 
@@ -208,21 +218,24 @@ namespace hal::tiva
             pinoutTableQeiIndexPins,
             Drive::None,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::qeiPhaseA,
             pinoutTableQeiPhaseAPins,
             Drive::None,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::qeiPhaseB,
             pinoutTableQeiPhaseBPins,
             Drive::None,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
     }};
 
@@ -247,18 +260,20 @@ namespace hal::tiva
     constexpr std::array<const Gpio::PinoutTable, 2> pinoutTableCanArray =
     {{
         {
-            PinConfigPeripheral::canTx,
+            PinConfigPeripheral::canRx,
             pinoutTableCanRxPins,
             Drive::None,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
-            PinConfigPeripheral::canRx,
+            PinConfigPeripheral::canTx,
             pinoutTableCanTxPins,
             Drive::None,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
     }};
 
@@ -331,63 +346,72 @@ namespace hal::tiva
             pinoutTablePwmFaultPins,
             Drive::None,
             hal::PinConfigType::input,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel0,
             pinoutTablePwmChannel0Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel1,
             pinoutTablePwmChannel1Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel2,
             pinoutTablePwmChannel2Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel3,
             pinoutTablePwmChannel3Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel4,
             pinoutTablePwmChannel4Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel5,
             pinoutTablePwmChannel5Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel6,
             pinoutTablePwmChannel6Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
         {
             PinConfigPeripheral::pwmChannel7,
             pinoutTablePwmChannel7Pins,
             Drive::Up,
             hal::PinConfigType::output,
-            Current::_2mA
+            Current::_2mA,
+            true,
         },
     }};
 

@@ -113,6 +113,15 @@ namespace hal::tiva
             return 1 << index;
         }
 
+        uint8_t ToPctl(const infra::MemoryRange<const Gpio::PinPosition>& pins, Port port, uint8_t index)
+        {
+            for (auto& pin : pins)
+                if (pin.pin == index && pin.port == port)
+                    return pin.portControl;
+
+            std::abort();
+        }
+
         template<class T> 
         constexpr bool GetBit(T& reg, uint32_t position)
         {
@@ -187,7 +196,7 @@ namespace hal::tiva
         infra::ReplaceBit(GpioTiva(port)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, index);
         infra::ReplaceBit(GpioTiva(port)->ODR, pushPullTiva[static_cast<uint8_t>(drive)].odr, index);
 
-        //infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0);
+        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0  << pinTiva[index].bits);
     }
 
     void GpioPin::Config(PinConfigType config, bool startOutputState)
@@ -243,17 +252,15 @@ namespace hal::tiva
 
         Gpio::Instance().ReservePin(port, index);
 
-        uint8_t portControl = peripheralPinConfig.first.portControl;
-        Drive drive = peripheralPinConfig.second.drive;
-        Current current = peripheralPinConfig.second.current;
+        auto portControl = peripheralPinConfig.second;
+        auto drive = peripheralPinConfig.second.drive;
+        auto current = peripheralPinConfig.second.current;
 
-        // TODO Peripherals use the weakpull, drive, and current from the peripheral's definition
+        infra::ReplaceBit(GpioTiva(port)->DIR, modeTiva[static_cast<uint8_t>(portControl.config)].dir, index);
+        infra::ReplaceBit(GpioTiva(port)->DEN, portControl.isDigital, index);
+        infra::ReplaceBit(GpioTiva(port)->AMSEL, !portControl.isDigital, index);
 
-#if 0
-        infra::ReplaceBit(GpioTiva(port)->DIR, modeTiva[static_cast<uint8_t>(config)].dir, index);
-        infra::ReplaceBit(GpioTiva(port)->DEN, modeTiva[static_cast<uint8_t>(config)].den, index);
-        infra::ReplaceBit(GpioTiva(port)->AMSEL, modeTiva[static_cast<uint8_t>(config)].amsel, index);
-#endif
+        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, ToPctl(portControl.pinPositions, port, index) << pinTiva[index].bits);
 
         infra::ReplaceBit(GpioTiva(port)->AFSEL, false, index);
         infra::ReplaceBit(GpioTiva(port)->DR2R, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
@@ -409,11 +416,13 @@ namespace hal::tiva
 
             Gpio::Instance().ReservePin(portAndIndex.first, portAndIndex.second);
 
-#if 0
-            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DIR, modeTiva[static_cast<uint8_t>(config)].dir, portAndIndex.second);
-            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DEN, modeTiva[static_cast<uint8_t>(config)].den, portAndIndex.second);
-            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AMSEL, modeTiva[static_cast<uint8_t>(config)].amsel, portAndIndex.second);
-#endif
+            auto portControl = peripheralPinConfig.second;
+
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DIR, modeTiva[static_cast<uint8_t>(portControl.config)].dir, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->DEN, portControl.isDigital, portAndIndex.second);
+            infra::ReplaceBit(GpioTiva(portAndIndex.first)->AMSEL, !portControl.isDigital, portAndIndex.second);
+
+            infra::MaskedUpdate(GpioTiva(portAndIndex.first)->PCTL, ~pinTiva[portAndIndex.second].mask, ToPctl(portControl.pinPositions, portAndIndex.first, portAndIndex.second) << pinTiva[portAndIndex.second].bits);
 
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->PUR, pushPullTiva[static_cast<uint8_t>(drive)].pur, portAndIndex.second);
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, portAndIndex.second);

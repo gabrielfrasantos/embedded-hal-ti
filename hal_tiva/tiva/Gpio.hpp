@@ -208,6 +208,7 @@ namespace hal::tiva
             Drive drive;
             PinConfigType config;
             Current current;
+            bool isDigital;
         };
 
     public:
