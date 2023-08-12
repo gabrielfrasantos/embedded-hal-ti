@@ -196,7 +196,7 @@ namespace hal::tiva
         infra::ReplaceBit(GpioTiva(port)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, index);
         infra::ReplaceBit(GpioTiva(port)->ODR, pushPullTiva[static_cast<uint8_t>(drive)].odr, index);
 
-        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0  << pinTiva[index].bits);
+        GpioTiva(port)->PCTL = (GpioTiva(port)->PCTL & pinTiva[index].mask) | 0 << pinTiva[index].bits;
     }
 
     void GpioPin::Config(PinConfigType config, bool startOutputState)
@@ -218,7 +218,7 @@ namespace hal::tiva
         infra::ReplaceBit(GpioTiva(port)->ODR, false, index);
 
         infra::ReplaceBit(GpioTiva(port)->AFSEL, false, index);
-        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, 0);
+        GpioTiva(port)->PCTL = (GpioTiva(port)->PCTL & pinTiva[index].mask) | 0 << pinTiva[index].bits;
 
         infra::ReplaceBit(GpioTiva(port)->DR2R, true, index);
         infra::ReplaceBit(GpioTiva(port)->DR4R, false, index);
@@ -260,9 +260,9 @@ namespace hal::tiva
         infra::ReplaceBit(GpioTiva(port)->DEN, portControl.isDigital, index);
         infra::ReplaceBit(GpioTiva(port)->AMSEL, !portControl.isDigital, index);
 
-        infra::MaskedUpdate(GpioTiva(port)->PCTL, ~pinTiva[index].mask, ToPctl(portControl.pinPositions, port, index) << pinTiva[index].bits);
+        GpioTiva(port)->PCTL = (GpioTiva(port)->PCTL & pinTiva[index].mask) | ToPctl(portControl.pinPositions, port, index) << pinTiva[index].bits;
 
-        infra::ReplaceBit(GpioTiva(port)->AFSEL, false, index);
+        infra::ReplaceBit(GpioTiva(port)->AFSEL, true, index);
         infra::ReplaceBit(GpioTiva(port)->DR2R, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, index);
         infra::ReplaceBit(GpioTiva(port)->DR4R, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, index);
         infra::ReplaceBit(GpioTiva(port)->DR8R, currentDriveTiva[static_cast<uint8_t>(current)]._8mA, index);
@@ -386,7 +386,7 @@ namespace hal::tiva
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->ODR, false, portAndIndex.second);
 
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->AFSEL, false, portAndIndex.second);
-            infra::MaskedUpdate(GpioTiva(portAndIndex.first)->PCTL, ~pinTiva[portAndIndex.second].mask, 0);
+            GpioTiva(portAndIndex.first)->PCTL = (GpioTiva(portAndIndex.first)->PCTL & pinTiva[portAndIndex.second].mask) | 0 << pinTiva[portAndIndex.second].bits;
 
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR2R, true, portAndIndex.second);
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR4R, false, portAndIndex.second);
@@ -422,14 +422,14 @@ namespace hal::tiva
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->DEN, portControl.isDigital, portAndIndex.second);
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->AMSEL, !portControl.isDigital, portAndIndex.second);
 
-            infra::MaskedUpdate(GpioTiva(portAndIndex.first)->PCTL, ~pinTiva[portAndIndex.second].mask, ToPctl(portControl.pinPositions, portAndIndex.first, portAndIndex.second) << pinTiva[portAndIndex.second].bits);
+            GpioTiva(portAndIndex.first)->PCTL = (GpioTiva(portAndIndex.first)->PCTL & pinTiva[portAndIndex.second].mask) | 0 << pinTiva[portAndIndex.second].bits;
 
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->PUR, pushPullTiva[static_cast<uint8_t>(drive)].pur, portAndIndex.second);
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->PDR, pushPullTiva[static_cast<uint8_t>(drive)].pdr, portAndIndex.second);
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->ODR, pushPullTiva[static_cast<uint8_t>(drive)].odr, portAndIndex.second);
 
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->AFSEL, true, portAndIndex.second);
-            infra::MaskedUpdate(GpioTiva(portAndIndex.first)->PCTL, pinTiva[portAndIndex.second].mask, peripheralPinConfig.first.portControl);
+            GpioTiva(portAndIndex.first)->PCTL = (GpioTiva(portAndIndex.first)->PCTL & pinTiva[portAndIndex.second].mask) | ToPctl(portControl.pinPositions, portAndIndex.first, portAndIndex.second) << pinTiva[portAndIndex.second].bits;
 
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR2R, currentDriveTiva[static_cast<uint8_t>(current)]._2mA, portAndIndex.second);
             infra::ReplaceBit(GpioTiva(portAndIndex.first)->DR4R, currentDriveTiva[static_cast<uint8_t>(current)]._4mA, portAndIndex.second);

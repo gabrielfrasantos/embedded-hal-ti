@@ -261,27 +261,26 @@ namespace hal::tiva
 
         while (infra::IsBitSet(uartArray[uartIndex]->FR, UART_FR_BUSY)) { } /* Wait for end of TX. */
 
-        infra::MaskedUpdate(uartArray[uartIndex]->LCRH, UART_LCRH_FEN, 0); /* Disable the FIFO. */
-        infra::MaskedUpdate(uartArray[uartIndex]->CTL, UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE, 0); /* Disable the UART. */
+        uartArray[uartIndex]->CTL  &=~ ( UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE); /* Disable the UART. */
+        uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN; /* Disable the FIFO. */
 
-        infra::MaskedUpdate(uartArray[uartIndex]->CC, true, UART_CC_CS_SYSCLK); /* System clock will be used in the UART */
-        infra::MaskedUpdate(uartArray[uartIndex]->CTL, true, UART_CTL_EOT); /* Transmit interrupt is generated when FIFO is empty */
-        infra::MaskedUpdate(uartArray[uartIndex]->CTL, is_hse, UART_CTL_HSE);
+        uartArray[uartIndex]->CC |= UART_CC_CS_SYSCLK; /* System clock will be used in the UART */
+        uartArray[uartIndex]->CTL |= UART_CTL_EOT; /* Transmit interrupt is generated when FIFO is empty */
+        uartArray[uartIndex]->CTL = (uartArray[uartIndex]->CTL & ~UART_CTL_HSE) | (is_hse ? UART_CTL_HSE : 0);
         uartArray[uartIndex]->IBRD = div / 64;
         uartArray[uartIndex]->FBRD = div % 64;
         uartArray[uartIndex]->LCRH |= parityTiva.at(static_cast<uint8_t>(config.parity));
         uartArray[uartIndex]->LCRH |= stopBitsTiva.at(static_cast<uint8_t>(config.stopbits));
         uartArray[uartIndex]->LCRH |= UART_LCRH_WLEN_8; /* 8 bits and enable fifos */
         uartArray[uartIndex]->FR = 0;
-
-        infra::MaskedUpdate(uartArray[uartIndex]->IFLS, UART_IFLS_RX7_8 | UART_IFLS_TX7_8, 1); /* Set fifo level */
-        infra::MaskedUpdate(uartArray[uartIndex]->CTL, UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE, 1); /* Enable the UART, RX and T. */
-        infra::MaskedUpdate(uartArray[uartIndex]->IM, UART_IM_OEIM, 1);  /* Enable overrun error interrupt */
+        uartArray[uartIndex]->IFLS |= UART_IFLS_RX7_8 | UART_IFLS_TX7_8; /* Set fifo level */
+        uartArray[uartIndex]->CTL |= UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE; /* Enable the UART, RX and Tx */
+        uartArray[uartIndex]->IM |= UART_IM_OEIM; /* Enable overrun error interrupt */
     }
 
     Uart::~Uart()
     {
-        infra::MaskedUpdate(uartArray[uartIndex]->CTL, UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE, 1);
+        uartArray[uartIndex]->CTL &=~ (UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE);
         uartArray[uartIndex]->IM = 0;
         DisableClock();
     }
@@ -292,14 +291,14 @@ namespace hal::tiva
         sendData = data;
         sending = true;
 
-        infra::MaskedUpdate(uartArray[uartIndex]->IM, UART_IM_TXIM, 1);  /* Enable TX interrupt */
+        uartArray[uartIndex]->IM |= UART_IM_TXIM;  /* Enable TX interrupt */
     }
 
     void Uart::ReceiveData(infra::Function<void(infra::ConstByteRange data)> dataReceived)
     {
         this->dataReceived = dataReceived;
 
-        infra::MaskedUpdate(uartArray[uartIndex]->IM, UART_IM_RXIM, dataReceived == nullptr);  /* Enable RX interrupt */
+        uartArray[uartIndex]->IM = (uartArray[uartIndex]->IM & ~UART_IM_RXIM) | !dataReceived ? UART_IM_RXIM : 0; /* Enable RX interrupt */
     }
 
     void Uart::RegisterInterrupt(const Config& config)

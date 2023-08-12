@@ -4,7 +4,7 @@ namespace hal::tiva
 {
     constexpr std::array<const Gpio::PinPosition, 9> pinoutTableUartRxPins =
     {{
-        { 0, Port::A, 1, 0x01 }, 
+        { 0, Port::A, 0, 0x01 }, 
         { 1, Port::C, 4, 0x02 }, 
         { 1, Port::B, 0, 0x01 }, 
         { 2, Port::D, 6, 0x01 },
@@ -17,7 +17,7 @@ namespace hal::tiva
 
     constexpr std::array<const Gpio::PinPosition, 9> pinoutTableUartTxPins =
     {{
-        { 0, Port::A, 0, 0x01 }, 
+        { 0, Port::A, 1, 0x01 }, 
         { 1, Port::C, 5, 0x02 }, 
         { 1, Port::B, 1, 0x01 }, 
         { 2, Port::D, 7, 0x01 },

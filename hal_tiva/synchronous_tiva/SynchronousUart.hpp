@@ -61,19 +61,68 @@ namespace hal::tiva
             bool ctsEnable = true;
         };
 
-        SynchronousUartSendOnly(uint8_t aUartIndex, GpioPin& uartTx, uint32_t baudrate = 115200);
-        SynchronousUartSendOnly(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRts, HwFlowControl flowControl, uint32_t baudrate = 115200);
+        enum class Baudrate : uint32_t
+        {
+            _600_bps,
+            _1200_bps,
+            _2400_bps,
+            _4800_bps,
+            _9600_bps,
+            _19200_bps,
+            _38600_bps,
+            _56700_bps,
+            _115200_bps,
+            _230400_bps,
+            _460800_bps,
+            _921000_bps,
+        };
+
+        enum class Parity : uint32_t
+        {
+            none,
+            even,
+            odd,
+        };
+
+        enum class StopBits : uint32_t
+        {
+            one,
+            two,
+        };
+
+        enum class NumberOfBytes : uint32_t
+        {
+            _8_bytes,
+            _16_bytes,
+        };
+
+        struct Config
+        {
+            constexpr Config()
+            {}
+
+            Baudrate baudrate = Baudrate::_115200_bps;
+            Parity parity = Parity::none;
+            StopBits stopbits = StopBits::one;
+            NumberOfBytes numberOfBytes = NumberOfBytes::_8_bytes;
+        };
+
+        SynchronousUartSendOnly(uint8_t aUartIndex, GpioPin& uartTx, const Config& config = Config());
+        SynchronousUartSendOnly(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRts, HwFlowControl flowControl, const Config& config = Config());
         ~SynchronousUartSendOnly();
 
         void SendData(infra::ConstByteRange data) override;
         bool ReceiveData(infra::ByteRange data) override;
 
     private:
-        void Initialization(HwFlowControl flowControl, uint32_t baudrate);
+        void Initialization(HwFlowControl flowControl, const Config& config);
+        void EnableClock();
+        void DisableClock();
 
         uint8_t uartIndex;
         PeripheralPin uartTx;
         infra::Optional<PeripheralPin> uartRts;
+        infra::MemoryRange<UART0_Type* const> uartArray;
     };
 }
 

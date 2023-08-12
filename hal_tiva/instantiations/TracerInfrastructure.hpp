@@ -3,6 +3,7 @@
 
 #include "hal_tiva/tiva/Gpio.hpp"
 #include "hal_tiva/synchronous_tiva/SynchronousUart.hpp"
+#include "hal_tiva/tiva/Uart.hpp"
 #include "services/tracer/StreamWriterOnSynchronousSerialCommunication.hpp"
 #include "services/tracer/TracerWithDateTime.hpp"
 
@@ -16,6 +17,7 @@ namespace instantiations
 
             uint8_t index;
             hal::tiva::GpioPin& tx;
+            hal::tiva::GpioPin& dummyTx = hal::tiva::dummyPin;
             hal::tiva::GpioPin& rx;
         };
 
@@ -23,6 +25,7 @@ namespace instantiations
         infra::StreamWriter& GetStreamWriter(bool loggingEnabled);
 
         hal::tiva::SynchronousUartSendOnly traceUart;
+        //hal::tiva::Uart terminalUart;
 
         infra::StreamWriterDummy dummyWriter;
         services::StreamWriterOnSynchronousSerialCommunication traceWriter;

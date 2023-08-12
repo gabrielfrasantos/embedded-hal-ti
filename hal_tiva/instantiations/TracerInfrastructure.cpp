@@ -15,9 +15,7 @@ namespace instantiations
         , tracerOutputStream(GetStreamWriter(loggingEnabled), infra::noFail)
         , alwaysEnabledTracer(alwaysEnabledTracerOutputStream)
         , tracer(tracerOutputStream)
-    {
-        tracer.Trace() << "----------------------------------------------------------";
-    }
+    {}
 
     infra::StreamWriter& TracerInfrastructure::GetStreamWriter(bool loggingEnabled)
     {

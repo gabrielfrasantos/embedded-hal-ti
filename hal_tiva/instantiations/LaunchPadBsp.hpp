@@ -3,6 +3,7 @@
 
 #include "hal_tiva/tiva/Gpio.hpp"
 #include "hal_tiva/instantiations/TracerInfrastructure.hpp"
+#include "services/util/Terminal.hpp"
 
 namespace instantiations
 {
@@ -16,13 +17,14 @@ namespace instantiations
         hal::tiva::GpioPin sw2{ hal::tiva::Port::F, 0 };
     };
 
-    struct LaunchPadTracer
+    struct LaunchPadTerminalAndTracer
     {
         hal::tiva::GpioPin traceUartTx{ hal::tiva::Port::A, 1 };
         hal::tiva::GpioPin traceUartRx{ hal::tiva::Port::A, 0 };
 
         TracerInfrastructure tracerInfrastructure{ { 0, traceUartTx, traceUartRx } };
         services::Tracer& tracer{ tracerInfrastructure.tracer };
+        //services::TerminalWithCommandsImpl terminal{  };
     };
 }
 
