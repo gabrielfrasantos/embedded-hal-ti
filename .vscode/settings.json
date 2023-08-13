@@ -7,7 +7,7 @@
     "cortex-debug.armToolchainPath.windows": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin",
     "cortex-debug.gdbPath.windows": "C:\\Program Files (x86)\\GNU Arm Embedded Toolchain\\10 2021.10\\bin\\arm-none-eabi-gdb.exe",
     "cortex-debug.JLinkGDBServerPath.windows": "C:\\Program Files (x86)\\SEGGER\\JLink\\JLinkGDBServerCL.exe",
-    "cortex-debug.variableUseNaturalFormat": true,
+    "cortex-debug.variableUseNaturalFormat": false,
     "files.associations": {
         "array": "cpp",
         "atomic": "cpp",
@@ -67,6 +67,7 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "fstream": "cpp"
     }
 }

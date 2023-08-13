@@ -17,8 +17,8 @@ target_sources(hal_tiva.synchronous_tiva PRIVATE
 #    SynchronousGpioStm.hpp
 #    SynchronousFlashInternalStm.cpp
 #    SynchronousFlashInternalStm.hpp
-#    SynchronousSpiMasterStm.cpp
-#    SynchronousSpiMasterStm.hpp
+    SynchronousSpiMaster.cpp
+    SynchronousSpiMaster.hpp
     SynchronousUart.cpp
     SynchronousUart.hpp
 )

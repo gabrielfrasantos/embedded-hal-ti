@@ -1,5 +1,4 @@
-#include "hal_tiva/tiva/SpiMaster.hpp"
-#include "infra/event/EventDispatcher.hpp"
+#include "hal_tiva/synchronous_tiva/SynchronousSpiMaster.hpp"
 #include "infra/util/BitLogic.hpp"
 
 namespace hal::tiva
@@ -118,20 +117,12 @@ namespace hal::tiva
             SSI3_BASE,
         }};
 
-        constexpr std::array<IRQn_Type, 4> peripheralIrqSsiArray =
-        {{
-            SSI0_IRQn,
-            SSI1_IRQn,
-            SSI2_IRQn,
-            SSI3_IRQn,
-        }};
-
         const infra::MemoryRange<SSI0_Type* const> peripheralSsi = infra::ReinterpretCastMemoryRange<SSI0_Type* const>(infra::MakeRange(peripheralSsiArray));
 
         extern "C" uint32_t SystemCoreClock;
     }
 
-    SpiMaster::SpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config, GpioPin& slaveSelect)
+    SynchronousSpiMaster::SynchronousSpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config, GpioPin& slaveSelect)
         : ssiIndex(aSpiIndex)
         , clock(clock, PinConfigPeripheral::spiClock)
         , miso(miso, PinConfigPeripheral::spiMiso)
@@ -139,7 +130,6 @@ namespace hal::tiva
         , slaveSelect(slaveSelect, PinConfigPeripheral::spiSlaveSelect)
     {
         ssiArray = peripheralSsi;
-        irqArray = infra::MakeRange(peripheralIrqSsiArray);
 
         EnableClock();
         ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_SSE; /* Disable SPI */
@@ -156,7 +146,6 @@ namespace hal::tiva
 
         ssiArray[ssiIndex]->CC = SSI_CC_CS_SYSPLL; /* SSI clock is sourced by main system clock  */
         ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_MS; /* Enable master mode */
-        ssiArray[ssiIndex]->CR1 |= SSI_CR1_EOT; /* Enable end of transmission */
         ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_DSS_M) | SSI_CR0_DSS_8; /* Configure number of bits */
         ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_FRF_M) | SSI_CR0_FRF_MOTO; /* Configure to SPI freescale format */
         ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_SCR_M) | phase_polarity(config.phase1st, config.polarityLow); /* Configure SPI phase/polarity */
@@ -166,123 +155,42 @@ namespace hal::tiva
         ssiArray[ssiIndex]->CR1 |= SSI_CR1_SSE; /* Enable SPI */
     }
 
-    SpiMaster::~SpiMaster()
+    SynchronousSpiMaster::~SynchronousSpiMaster()
     {
         ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_SSE; /* Disable SPI */
         DisableClock();
     }
 
-    void SpiMaster::SendAndReceive(infra::ConstByteRange sendData, infra::ByteRange receiveData, SpiAction nextAction, const infra::Function<void()>& onDone)
+    void SynchronousSpiMaster::SendAndReceive(infra::ConstByteRange sendData, infra::ByteRange receiveData, Action nextAction)
     {
-        this->onDone = onDone;
-        if (chipSelectConfigurator && !continuedSession)
-            chipSelectConfigurator->StartSession();
-        continuedSession = nextAction == SpiAction::continueSession;
+        really_assert(sendData.size() == receiveData.size());
 
-        assert(sendData.size() == receiveData.size() || sendData.empty() || receiveData.empty());
-        this->sendData = sendData;
-        this->receiveData = receiveData;
-        sending = !sendData.empty();
-        receiving = !receiveData.empty();
-
-        if (!sending)
-            dummyToSend = receiveData.size();
-        if (!receiving)
-            dummyToReceive = sendData.size();
-
-        really_assert(!spiInterruptRegistration);
-        spiInterruptRegistration.Emplace(irqArray[ssiIndex], [this]()
-            {
-                HandleInterrupt();
-            });
-
-        ssiArray[ssiIndex]->IM |= SSI_IM_TXIM | SSI_IM_RXIM | SSI_IM_RORIM; /* Enable RX/TX interrupt */
-    }
-
-    void SpiMaster::SetChipSelectConfigurator(ChipSelectConfigurator& configurator)
-    {
-        chipSelectConfigurator = &configurator;
-    }
-
-    void SpiMaster::SetCommunicationConfigurator(CommunicationConfigurator& configurator)
-    {
-        communicationConfigurator = &configurator;
-        communicationConfigurator->ActivateConfiguration();
-    }
-
-    void SpiMaster::ResetCommunicationConfigurator()
-    {
-        if (communicationConfigurator)
-            communicationConfigurator->DeactivateConfiguration();
-
-        communicationConfigurator = nullptr;
-    }
-
-    void SpiMaster::HandleInterrupt()
-    {
-        uint32_t status = ssiArray[ssiIndex]->SR;
-
-        if ((status & SSI_RIS_RORRIS))
+        for (std::size_t i = 0; i < sendData.size(); i++)
         {
-            ssiArray[ssiIndex]->ICR |= SSI_ICR_RORIC;
-
-            really_assert(status & SSI_RIS_RORRIS);
-        }
-
-        if ((status & SSI_RIS_RXRIS))
-        {
-            if (dummyToReceive != 0)
-            {
-                (void)ssiArray[ssiIndex]->DR;
-                --dummyToReceive;
-            }
-            else if (receiving)
-            {
-                receiveData.front() = ssiArray[ssiIndex]->DR;
-                receiveData.pop_front();
-            }
-
-            receiving &= !receiveData.empty();
-
-            if (dummyToReceive == 0 && !receiving)
-                ssiArray[ssiIndex]->IM &= ~SSI_IM_RXIM;
-        }
-
-        if ((status & SSI_RIS_TXRIS) != 0)
-        {
-            if (dummyToSend != 0)
-            {
-                reinterpret_cast<volatile uint8_t&>(ssiArray[ssiIndex]->DR) = 0;
-                --dummyToSend;
-            }
-            else if (sending)
-            {
-                reinterpret_cast<volatile uint8_t&>(ssiArray[ssiIndex]->DR) = sendData.front();
-                sendData.pop_front();
-            }
-
-            sending &= !sendData.empty();
-
-            // After the first transmit, disable interrupt on transmit buffer empty,
-            // so that a receive is done before each transmit
-            ssiArray[ssiIndex]->IM &= ~SSI_IM_TXIM;
-        }
-
-        spiInterruptRegistration->ClearPending();
-
-        if (!sending && !receiving && dummyToSend == 0 && dummyToReceive == 0)
-        {
-            spiInterruptRegistration = infra::none;
-            if (chipSelectConfigurator && !continuedSession)
-                chipSelectConfigurator->EndSession();
-            infra::EventDispatcher::Instance().Schedule([this]()
-                {
-                    onDone();
-                });
+            Send(sendData[i]);
+            receiveData[i] = Receive();
         }
     }
 
-    void SpiMaster::EnableClock()
+    void SynchronousSpiMaster::Send(uint8_t data)
+    {
+        while(!(ssiArray[ssiIndex]->SR & SSI_SR_TNF))
+        {
+        }
+
+        ssiArray[ssiIndex]->DR = data;
+    }
+
+    uint8_t SynchronousSpiMaster::Receive()
+    {
+        while(!(ssiArray[ssiIndex]->SR & SSI_SR_RNE))
+        {
+        }
+        
+        return ssiArray[ssiIndex]->DR;
+    }
+
+    void SynchronousSpiMaster::EnableClock()
     {
         infra::ReplaceBit(SYSCTL->RCGCSSI, true, ssiIndex);
 
@@ -291,7 +199,7 @@ namespace hal::tiva
         }
     }
 
-    void SpiMaster::DisableClock()
+    void SynchronousSpiMaster::DisableClock()
     {
         infra::ReplaceBit(SYSCTL->RCGCSSI, false, ssiIndex);
     }
