@@ -147,7 +147,7 @@ namespace hal::tiva
             ((GpioTiva(port) == GPIOD) && (index == 7)))
         {
             GpioTiva(port)->LOCK = 0x4C4F434B;
-            infra::ReplaceBit(GpioTiva(port)->CR, false, index);
+            infra::ReplaceBit(GpioTiva(port)->CR, true, index);
             GpioTiva(port)->LOCK = 0;
         }
     }

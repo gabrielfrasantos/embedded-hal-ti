@@ -20,7 +20,7 @@ namespace hal::tiva
             uint32_t baudRate = 100000;
         };
 
-        SynchronousSpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config = Config(), GpioPin& slaveSelect = dummyPin);
+        SynchronousSpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config = Config());
         ~SynchronousSpiMaster();
 
         // Implementation of SynchronousSpi
@@ -38,7 +38,6 @@ namespace hal::tiva
         PeripheralPin clock;
         PeripheralPin miso;
         PeripheralPin mosi;
-        PeripheralPin slaveSelect;
 
         infra::MemoryRange<SSI0_Type* const> ssiArray;
     };

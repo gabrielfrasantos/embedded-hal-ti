@@ -6,6 +6,7 @@ namespace hal::tiva
     namespace
     {
         constexpr const uint32_t SSI_CR0_SCR_M = 0x0000FF00;  // SSI Serial Clock Rate
+        constexpr const uint32_t SSI_CR0_SPH_SPO_M = 0x000000C0;  // SSI Serial Clock Rate
         constexpr const uint32_t SSI_CR0_SPH = 0x00000080;  // SSI Serial Clock Phase
         constexpr const uint32_t SSI_CR0_SPO = 0x00000040;  // SSI Serial Clock Polarity
         constexpr const uint32_t SSI_CR0_FRF_M = 0x00000030;  // SSI Frame Format Select
@@ -122,17 +123,15 @@ namespace hal::tiva
         extern "C" uint32_t SystemCoreClock;
     }
 
-    SynchronousSpiMaster::SynchronousSpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config, GpioPin& slaveSelect)
+    SynchronousSpiMaster::SynchronousSpiMaster(uint8_t aSpiIndex, GpioPin& clock, GpioPin& miso, GpioPin& mosi, const Config& config)
         : ssiIndex(aSpiIndex)
         , clock(clock, PinConfigPeripheral::spiClock)
         , miso(miso, PinConfigPeripheral::spiMiso)
         , mosi(mosi, PinConfigPeripheral::spiMosi)
-        , slaveSelect(slaveSelect, PinConfigPeripheral::spiSlaveSelect)
     {
         ssiArray = peripheralSsi;
 
         EnableClock();
-        ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_SSE; /* Disable SPI */
 
         auto max = SystemCoreClock / config.baudRate;
         uint32_t div = 0;
@@ -144,15 +143,20 @@ namespace hal::tiva
         }
         while(scr > 255);
 
+        ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_SSE; /* Disable SPI */
         ssiArray[ssiIndex]->CC = SSI_CC_CS_SYSPLL; /* SSI clock is sourced by main system clock  */
         ssiArray[ssiIndex]->CR1 &=~ SSI_CR1_MS; /* Enable master mode */
         ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_DSS_M) | SSI_CR0_DSS_8; /* Configure number of bits */
         ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_FRF_M) | SSI_CR0_FRF_MOTO; /* Configure to SPI freescale format */
-        ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_SCR_M) | phase_polarity(config.phase1st, config.polarityLow); /* Configure SPI phase/polarity */
+        ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_SPH_SPO_M) | phase_polarity(config.phase1st, config.polarityLow); /* Configure SPI phase/polarity */
         ssiArray[ssiIndex]->CR0 = (ssiArray[ssiIndex]->CR0 & ~SSI_CR0_SCR_M) | ((scr & 0xFF) << SSI_CR0_SCR_S); /* Sets clock rate */
-        ssiArray[ssiIndex]->CPSR = (ssiArray[ssiIndex]->CPSR & ~SSI_CPSR_CPSDVSR_M) | div; /* Sets prescaler */
+        ssiArray[ssiIndex]->CPSR = (ssiArray[ssiIndex]->CPSR & ~SSI_CPSR_CPSDVSR_M) | div & 0xff; /* Sets prescaler */
 
         ssiArray[ssiIndex]->CR1 |= SSI_CR1_SSE; /* Enable SPI */
+
+        while((ssiArray[ssiIndex]->SR & SSI_SR_RNE))
+        {
+        }
     }
 
     SynchronousSpiMaster::~SynchronousSpiMaster()
@@ -163,12 +167,19 @@ namespace hal::tiva
 
     void SynchronousSpiMaster::SendAndReceive(infra::ConstByteRange sendData, infra::ByteRange receiveData, Action nextAction)
     {
-        really_assert(sendData.size() == receiveData.size());
+        really_assert(sendData.size() == receiveData.size() || sendData.empty() || receiveData.empty());
 
         for (std::size_t i = 0; i < sendData.size(); i++)
         {
-            Send(sendData[i]);
-            receiveData[i] = Receive();
+            Send(sendData.empty() ? 0 : sendData[i]);
+            auto data = Receive();
+
+            if (!receiveData.empty())
+                receiveData[i] = data;
+        }
+
+        while (ssiArray[ssiIndex]->SR & SSI_SR_BSY)
+        {
         }
     }
 
