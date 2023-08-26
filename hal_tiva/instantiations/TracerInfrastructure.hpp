@@ -13,19 +13,17 @@ namespace instantiations
     {
         struct Configuration
         {
-            Configuration(uint8_t index, hal::tiva::GpioPin& tx, hal::tiva::GpioPin& rx);
+            Configuration(uint8_t index, hal::tiva::GpioPin& tx);
 
             uint8_t index;
             hal::tiva::GpioPin& tx;
             hal::tiva::GpioPin& dummyTx = hal::tiva::dummyPin;
-            hal::tiva::GpioPin& rx;
         };
 
         TracerInfrastructure(const Configuration& configuration, bool loggingEnabled = true);
         infra::StreamWriter& GetStreamWriter(bool loggingEnabled);
 
         hal::tiva::SynchronousUartSendOnly traceUart;
-        //hal::tiva::Uart terminalUart;
 
         infra::StreamWriterDummy dummyWriter;
         services::StreamWriterOnSynchronousSerialCommunication traceWriter;

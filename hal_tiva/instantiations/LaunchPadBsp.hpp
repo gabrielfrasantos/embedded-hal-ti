@@ -20,11 +20,9 @@ namespace instantiations
     struct LaunchPadTerminalAndTracer
     {
         hal::tiva::GpioPin traceUartTx{ hal::tiva::Port::A, 1 };
-        hal::tiva::GpioPin traceUartRx{ hal::tiva::Port::A, 0 };
 
-        TracerInfrastructure tracerInfrastructure{ { 0, traceUartTx, traceUartRx } };
+        TracerInfrastructure tracerInfrastructure{ { 0, traceUartTx } };
         services::Tracer& tracer{ tracerInfrastructure.tracer };
-        //services::TerminalWithCommandsImpl terminal{  };
     };
 }
 

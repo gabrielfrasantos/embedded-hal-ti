@@ -62,6 +62,8 @@ namespace hal::tiva
             constexpr Config()
             {}
 
+            bool enableTx = true;
+            bool enableRx = true;
             Baudrate baudrate = Baudrate::_115200_bps;
             FlowControl hwFlowControl = FlowControl::none;
             Parity parity = Parity::none;
@@ -91,6 +93,8 @@ namespace hal::tiva
         PeripheralPin uartRx;
         infra::Optional<PeripheralPin> uartRts;
         infra::Optional<PeripheralPin> uartCts;
+        uint32_t enableTx = 0;
+        uint32_t enableRx = 0;
 
         infra::Function<void()> transferDataComplete;
         infra::Function<void(infra::ConstByteRange data)> dataReceived;
