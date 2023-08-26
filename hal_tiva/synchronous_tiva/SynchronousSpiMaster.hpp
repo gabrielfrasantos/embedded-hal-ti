@@ -12,7 +12,10 @@ namespace hal::tiva
     public:
         struct Config
         {
-            constexpr Config()
+            constexpr Config(bool polarityLow = true, bool phase1st = true, uint32_t baudRate = 100000)
+                : polarityLow(polarityLow)
+                , phase1st(phase1st)
+                , baudRate(baudRate)
             {}
 
             bool polarityLow = true;
