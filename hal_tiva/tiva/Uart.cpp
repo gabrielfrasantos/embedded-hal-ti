@@ -282,7 +282,8 @@ namespace hal::tiva
         uartArray[uartIndex]->CTL |= UART_CTL_UARTEN | enableTx | enableRx; /* Enable the UART, RX and Tx */
         uartArray[uartIndex]->IM |= UART_IM_OEIM; /* Enable overrun error interrupt */
 
-        NVIC_SetPriority(irqArray[uartIndex], 6);
+        if (config.priority)
+            NVIC_SetPriority(irqArray[uartIndex], static_cast<uint32_t>(*config.priority));
     }
 
     Uart::~Uart()
