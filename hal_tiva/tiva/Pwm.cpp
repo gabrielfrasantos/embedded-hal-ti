@@ -302,7 +302,7 @@ namespace hal::tiva
         {{
             PWM0_BASE,
             PWM1_BASE,
-        }}; 
+        }};
 
         const infra::MemoryRange<PWM0_Type* const> peripheralPwm = infra::ReinterpretCastMemoryRange<PWM0_Type* const>(infra::MakeRange(peripheralPwmArray));
 
@@ -316,11 +316,11 @@ namespace hal::tiva
     Pwm::Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, const Config& config)
         : Pwm(aPwmIndex, channel0, channel1, PinChannel(), PinChannel(), config)
     { }
-    
+
     Pwm::Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, PinChannel channel2, const Config& config)
         : Pwm(aPwmIndex, channel0, channel1, channel2, PinChannel(), config)
     { }
-    
+
     Pwm::Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, PinChannel channel2, PinChannel channel3, const Config& config)
         : pwmIndex(aPwmIndex)
         , config(config)
@@ -345,34 +345,34 @@ namespace hal::tiva
         DisableClock();
     }
 
-    void Pwm::SetBaseFrequency(uint32_t baseFrequency)
+    void Pwm::SetBaseFrequency(hal::Hertz baseFrequency)
     {
-        auto load = (peripheralFrequency / baseFrequency) - 1;
+        auto load = (peripheralFrequency / baseFrequency.Value()) - 1;
         really_assert((load & 0xffff) == 0);
 
         this->baseFrequency = baseFrequency;
     }
 
-    void Pwm::Start(uint8_t globalDutyCycle)
+    void Pwm::Start(hal::Percent globalDutyCycle)
     {
-        really_assert(globalDutyCycle < 100);
+        really_assert(globalDutyCycle.Value() < 100);
 
         Reset();
         MasterControl();
-        
+
         for (auto& channel : channels)
         {
             channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE;
 
             Configure(channel);
 
-            auto comparator = channel.address->LOAD * globalDutyCycle / 100;
+            auto comparator = channel.address->LOAD * globalDutyCycle.Value() / 100;
 
             if (channel.a)
                 channel.address->CMPA = comparator;
             if (channel.b)
                 channel.address->CMPB = comparator;
-            
+
             channel.address->CTL |= PWM_CHANNEL_CTL_ENABLE;
         }
     }
@@ -385,20 +385,6 @@ namespace hal::tiva
         }
     }
 
-    void Pwm::DeadTime(uint8_t deadTime)
-    {
-        for (auto& channel : channels)
-        {
-            auto ctl = channel.address->CTL;
-            channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE; // Ensure channel is disabled
-
-            channel.address->DBFALL = deadTime;
-            channel.address->DBRISE = deadTime;
-            
-            channel.address->CTL = ctl;
-        }
-    }
-
     void Pwm::HandleInterrupt()
     {
 
@@ -408,8 +394,8 @@ namespace hal::tiva
     {
         if (channel.a || channel.b)
         {
-            auto load = (peripheralFrequency / baseFrequency) - 1;
-            really_assert((load & 0xffff) == 0);        
+            auto load = (peripheralFrequency / baseFrequency.Value()) - 1;
+            really_assert((load & 0xffff) == 0);
 
             channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE;
 
@@ -422,11 +408,13 @@ namespace hal::tiva
             channel.address->CTL |= config.control.Value();
             channel.address->GENA = config.generatorA.Value();
             channel.address->GENB = config.generatorB.Value();
-            
+            channel.address->DBFALL = config.deadTime.fall;
+            channel.address->DBRISE = config.deadTime.rise;
+
             peripheralPwm[pwmIndex]->ENABLE |= channel.enable;
         }
     }
-    
+
     void Pwm::Reset()
     {
         SYSCTL->SRPWM |= 1 << pwmIndex;
