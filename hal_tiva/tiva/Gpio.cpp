@@ -68,15 +68,51 @@ namespace hal::tiva
             { GPIOD, 0x00000008, },
             { GPIOE, 0x00000010, },
             { GPIOF, 0x00000020, },
+#if defined(GPIOG)
             { GPIOG, 0x00000040, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOH)
             { GPIOH, 0x00000080, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOJ)
             { GPIOJ, 0x00000100, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOK)
             { GPIOK, 0x00000200, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOL)
             { GPIOL, 0x00000400, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOM)
             { GPIOM, 0x00000800, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPION)
             { GPION, 0x00001000, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOP)
             { GPIOP, 0x00002000, },
+#else
+            { nullptr, 0, },
+#endif
+#if defined(GPIOQ)
             { GPIOQ, 0x00004000, },
+#else
+            { nullptr, 0, },
+#endif
         }};
 
         const std::array<PushPull, 4> pushPullTiva{ {

@@ -11,7 +11,7 @@ namespace instantiations
     struct LaunchPadClock
     {
         hal::tiva::crystalFrequency crystal = hal::tiva::crystalFrequency::_16_MHz;
-        hal::tiva::oscillatorSource oscSource = oscillatorSource::main;
+        hal::tiva::oscillatorSource oscSource = hal::tiva::oscillatorSource::main;
         hal::tiva::systemClockDivider systemClockDivisor{ 2,5 };
         bool usesPll = true;
     };

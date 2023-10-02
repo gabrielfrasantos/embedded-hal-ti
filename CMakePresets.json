@@ -20,7 +20,11 @@
       "name": "host",
       "displayName": "host",
       "description": "Build required tools for host",
-      "inherits": "defaults"
+      "inherits": "defaults",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+      },
+      "generator": "Ninja Multi-Config"
     },
     {
       "name": "tiva",
