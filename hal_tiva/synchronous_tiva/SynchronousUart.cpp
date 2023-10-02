@@ -234,7 +234,7 @@ namespace hal::tiva
     {
         if (flowControl.rtsEnable)
             this->uartRts.Emplace(uartRts, PinConfigPeripheral::uartRts);
-        if (flowControl.ctsEnable)   
+        if (flowControl.ctsEnable)
             this->uartCts.Emplace(uartCts, PinConfigPeripheral::uartCts);
     }
 
@@ -326,7 +326,7 @@ namespace hal::tiva
         uint32_t baudrate = is_hse ? baudRateTiva.at(static_cast<uint8_t>(config.baudrate)) / 2 : baudRateTiva.at(static_cast<uint8_t>(config.baudrate));
         uint32_t div = (((SystemCoreClock * 8) / baudrate) + 1) / 2;
 
-        while (uartArray[uartIndex]->FR & UART_FR_BUSY != 0) { } /* Wait for end of TX. */
+        while (uartArray[uartIndex]->FR & UART_FR_BUSY) { } /* Wait for end of TX. */
 
         uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN; /* Disable the FIFO. */
         uartArray[uartIndex]->CTL  &=~ ( UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE); /* Disable the UART. */

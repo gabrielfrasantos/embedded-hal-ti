@@ -2,6 +2,12 @@
 #include "infra/event/EventDispatcher.hpp"
 #include "infra/util/BitLogic.hpp"
 
+#if defined(TM4C129)
+#define NUMBER_OF_QEI   1
+#else
+#define NUMBER_OF_QEI   2
+#endif
+
 namespace hal::tiva
 {
     namespace
@@ -64,16 +70,20 @@ namespace hal::tiva
         constexpr const uint32_t QEI_ISC_TIMER = 0x00000002;  // Velocity Timer Expired Interrupt
         constexpr const uint32_t QEI_ISC_INDEX = 0x00000001;  // Index Pulse Interrupt
 
-        constexpr std::array<uint32_t, 2> peripheralQeiArray =
+        constexpr std::array<uint32_t, NUMBER_OF_QEI> peripheralQeiArray =
         {{
             QEI0_BASE,
+#if defined(TM4C123)
             QEI1_BASE,
+#endif
         }};
 
-        constexpr std::array<IRQn_Type, 2> peripheralIrqQeiArray =
+        constexpr std::array<IRQn_Type, NUMBER_OF_QEI> peripheralIrqQeiArray =
         {{
             QEI0_IRQn,
+#if defined(TM4C123)
             QEI1_IRQn,
+#endif
         }};
 
         const infra::MemoryRange<QEI0_Type* const> peripheralQei = infra::ReinterpretCastMemoryRange<QEI0_Type* const>(infra::MakeRange(peripheralQeiArray));

@@ -4,6 +4,18 @@
 #include "infra/util/ReallyAssert.hpp"
 #include <array>
 
+#if defined(TM4C129)
+#define GPIOA  GPIOA_AHB
+#define GPIOB  GPIOB_AHB
+#define GPIOC  GPIOC_AHB
+#define GPIOD  GPIOD_AHB
+#define GPIOE  GPIOE_AHB
+#define GPIOF  GPIOF_AHB
+#define GPIOG  GPIOG_AHB
+#define GPIOH  GPIOH_AHB
+#define GPIOJ  GPIOJ_AHB
+#endif
+
 namespace hal::tiva
 {
     namespace
@@ -49,13 +61,22 @@ namespace hal::tiva
         };
 
         // clang-format off
-        const std::array<Peripheral, 6> portAndRcgc {{
-            { GPIOA, 0x01, },
-            { GPIOB, 0x02, },
-            { GPIOC, 0x04, },
-            { GPIOD, 0x08, },
-            { GPIOE, 0x10, },
-            { GPIOF, 0x20, },
+        const std::array<Peripheral, 15> portAndRcgc {{
+            { GPIOA, 0x00000001, },
+            { GPIOB, 0x00000002, },
+            { GPIOC, 0x00000004, },
+            { GPIOD, 0x00000008, },
+            { GPIOE, 0x00000010, },
+            { GPIOF, 0x00000020, },
+            { GPIOG, 0x00000040, },
+            { GPIOH, 0x00000080, },
+            { GPIOJ, 0x00000100, },
+            { GPIOK, 0x00000200, },
+            { GPIOL, 0x00000400, },
+            { GPIOM, 0x00000800, },
+            { GPION, 0x00001000, },
+            { GPIOP, 0x00002000, },
+            { GPIOQ, 0x00004000, },
         }};
 
         const std::array<PushPull, 4> pushPullTiva{ {
@@ -122,7 +143,7 @@ namespace hal::tiva
             std::abort();
         }
 
-        template<class T> 
+        template<class T>
         constexpr bool GetBit(T& reg, uint32_t position)
         {
             return reg & (1 << position);
@@ -136,14 +157,14 @@ namespace hal::tiva
         , index(index)
         , drive(drive)
         , current(current)
-    { 
+    {
         SYSCTL->RCGCGPIO = SYSCTL->RCGCGPIO | Rcgc(port);
 
         while (!(SYSCTL->PRGPIO & Rcgc(port)))
         {
         }
 
-        if (((GpioTiva(port) == GPIOF) && (index == 0)) || 
+        if (((GpioTiva(port) == GPIOF) && (index == 0)) ||
             ((GpioTiva(port) == GPIOD) && (index == 7)))
         {
             GpioTiva(port)->LOCK = 0x4C4F434B;
@@ -363,7 +384,7 @@ namespace hal::tiva
             {
             }
 
-            if (((GpioTiva(portAndIndex.first) == GPIOF) && (portAndIndex.second == 0)) || 
+            if (((GpioTiva(portAndIndex.first) == GPIOF) && (portAndIndex.second == 0)) ||
                 ((GpioTiva(portAndIndex.first) == GPIOD) && (portAndIndex.second == 7))) // NOLINT
             {
                 GpioTiva(portAndIndex.first)->LOCK = 0x4C4F434B;
