@@ -1,11 +1,21 @@
 include(hal_driver.cmake)
 
-add_hal_driver(ti.hal_driver_${TARGET_MCU_FAMILY} TI ${TARGET_MCU_FAMILY})
-emil_build_for(ti.hal_driver_${TARGET_MCU_FAMILY} TARGET_MCU_FAMILY ${TARGET_MCU_FAMILY} PREREQUISITE_BOOL HAL_TI_STANDALONE)
+add_hal_driver(ti.hal_driver_TM4C123 TI TM4C123)
+emil_build_for(ti.hal_driver_TM4C123 TARGET_MCU_FAMILY TM4C123 PREREQUISITE_BOOL HAL_TI_STANDALONE)
 
-target_compile_definitions(ti.hal_driver_${TARGET_MCU_FAMILY} PUBLIC
+target_compile_definitions(ti.hal_driver_TM4C123 PUBLIC
     DEVICE_HEADER="TIVA.h"
-    ${TARGET_MCU_FAMILY}
+    TM4C123
+    $<$<STREQUAL:${TARGET_MCU},tm4c123gh6pm>:TM4C123GH6PM>
+    $<$<STREQUAL:${TARGET_MCU},tm4c1294ncpdt>:TM4C1294NCPDT>
+)
+
+add_hal_driver(ti.hal_driver_TM4C129 TI TM4C129)
+emil_build_for(ti.hal_driver_TM4C129 TARGET_MCU_FAMILY TM4C129 PREREQUISITE_BOOL HAL_TI_STANDALONE)
+
+target_compile_definitions(ti.hal_driver_TM4C129 PUBLIC
+    DEVICE_HEADER="TIVA.h"
+    TM4C129
     $<$<STREQUAL:${TARGET_MCU},tm4c123gh6pm>:TM4C123GH6PM>
     $<$<STREQUAL:${TARGET_MCU},tm4c1294ncpdt>:TM4C1294NCPDT>
 )
