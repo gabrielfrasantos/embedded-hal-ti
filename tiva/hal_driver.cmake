@@ -15,8 +15,8 @@ function(add_hal_driver target_name manufacturer manufacturer_family)
 
     file(GLOB sources_in RELATIVE ${CMAKE_CURRENT_LIST_DIR}
         CMSIS/Core/Include/*.h
-        CMSIS/Device/${manufacturer}/*/Include/*.h
-        CMSIS/Device/${manufacturer}/*/Source/Templates/system_*.c
+        CMSIS/Device/${manufacturer}/${manufacturer_family}/Include/*.h
+        CMSIS/Device/${manufacturer}/${manufacturer_family}/Source/Templates/system_*.c
     )
 
     set(sources)
@@ -31,7 +31,7 @@ function(add_hal_driver target_name manufacturer manufacturer_family)
     )
 
     file(GLOB startup_source
-        CMSIS/Device/${manufacturer}/*/Source/Templates/gcc/startup_${manufacturer_family}.c
+        CMSIS/Device/${manufacturer}/${manufacturer_family}/Source/Templates/gcc/startup_${manufacturer_family}.c
     )
 
     if (startup_source)
@@ -40,4 +40,4 @@ function(add_hal_driver target_name manufacturer manufacturer_family)
 
 endfunction()
 
-define_property(TARGET PROPERTY HAL_TI_STARTUP_SOURCE  BRIEF_DOCS "Startup source" FULL_DOCS "The source file that contains the startup and interrupt vector code.")
+define_property(TARGET PROPERTY HAL_TI_STARTUP_SOURCE BRIEF_DOCS "Startup source" FULL_DOCS "The source file that contains the startup and interrupt vector code.")
