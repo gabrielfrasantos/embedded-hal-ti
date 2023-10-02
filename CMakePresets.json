@@ -45,6 +45,18 @@
         "TARGET_MCU_FAMILY": "TM4C123",
         "TARGET_MCU": "tm4c123gh6pm"
       }
+    },
+    {
+      "name": "tm4c1294ncpdt",
+      "displayName": "tm4c1294ncpdt",
+      "description": "Build for tm4c1294ncpdt",
+      "inherits": "tiva",
+      "toolchainFile": "${sourceDir}/build/${presetName}/_deps/emil-src/cmake/toolchain-arm-gcc-m4-fpv4-sp-d16.cmake",
+      "cacheVariables": {
+        "TARGET_CORTEX": "m4",
+        "TARGET_MCU_FAMILY": "TM4C129",
+        "TARGET_MCU": "tm4c1294ncpdt"
+      }
     }
   ],
   "buildPresets": [
@@ -57,6 +69,21 @@
       "name": "tm4c123gh6pm-RelWithDebInfo",
       "configuration": "RelWithDebInfo",
       "configurePreset": "tm4c123gh6pm"
+    },
+    {
+      "name": "tm4c123gh6pm-Debug",
+      "configuration": "Debug",
+      "configurePreset": "tm4c123gh6pm"
+    },
+    {
+      "name": "tm4c1294ncpdt-RelWithDebInfo",
+      "configuration": "RelWithDebInfo",
+      "configurePreset": "tm4c1294ncpdt"
+    },
+    {
+      "name": "tm4c1294ncpdt-Debug",
+      "configuration": "Debug",
+      "configurePreset": "tm4c1294ncpdt"
     }
   ]
 }
