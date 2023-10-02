@@ -264,7 +264,7 @@ namespace hal::tiva
         if (config.enableTx)
             enableTx = UART_CTL_TXE;
 
-        while (infra::IsBitSet(uartArray[uartIndex]->FR, UART_FR_BUSY)) { } /* Wait for end of TX. */
+        while (uartArray[uartIndex]->FR & UART_FR_BUSY) { } /* Wait for end of TX. */
 
         uartArray[uartIndex]->CTL  &=~ ( UART_CTL_UARTEN | enableTx | enableRx); /* Disable the UART. */
         uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN; /* Disable the FIFO. */
