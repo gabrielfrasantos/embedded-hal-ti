@@ -15,46 +15,24 @@ target_link_libraries(hal_tiva.tiva PUBLIC
 )
 
 target_sources(hal_tiva.tiva PRIVATE
-#    AnalogToDigitalPinStm.cpp
-#    AnalogToDigitalPinStm.hpp
-#    CanStm.cpp
-#    CanStm.hpp
-    Clock.cpp
-    Clock.hpp
-#    DigitalToAnalogPinStm.cpp
-#    DigitalToAnalogPinStm.hpp
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:DmaStm.cpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:DmaStm.hpp>
-#    FlashInternalStm.cpp
-#    FlashInternalStm.hpp
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C123>:ClockTm4c123.cpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C123>:ClockTm4c123.hpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:ClockTm4c129.cpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:ClockTm4c129.hpp>
     Gpio.cpp
     Gpio.hpp
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.cpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:I2cStm.hpp>
-    PinoutTableDefault.cpp
-    PinoutTableDefault.hpp
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C123>:PinoutTableDefaultTm4c123.cpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C123>:PinoutTableDefaultTm4c123.hpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:PinoutTableDefaultTm4c129.cpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:PinoutTableDefaultTm4c129.hpp>
     Pwm.cpp
     Pwm.hpp
     QuadratureEncoder.cpp
     QuadratureEncoder.hpp
-#    SpiDataSizeConfiguratorStm.cpp
-#    SpiDataSizeConfiguratorStm.hpp
     SpiMaster.cpp
     SpiMaster.hpp
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.cpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiMasterStmDma.hpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.cpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:SpiSlaveStmDma.hpp>
     Uart.cpp
     Uart.hpp
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStmDma.cpp>
-#    $<$<NOT:$<STREQUAL:${TARGET_MCU_FAMILY},stm32g0xx>>:UartStmDma.hpp>
-#    $<$<OR:$<STREQUAL:${TARGET_MCU},stm32wb55>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32f7xx>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32g4xx>>:UartStmDuplexDma.cpp>
-#    $<$<OR:$<STREQUAL:${TARGET_MCU},stm32wb55>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32f7xx>,$<STREQUAL:${TARGET_MCU_FAMILY},stm32g4xx>>:UartStmDuplexDma.hpp>
-#    UsbLinkLayerStm.cpp
-#    UsbLinkLayerStm.hpp
     UniqueDeviceId.cpp
     UniqueDeviceId.hpp
-#    WatchDogStm.cpp
-#    WatchDogStm.hpp
 )

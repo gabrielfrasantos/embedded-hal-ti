@@ -19,6 +19,8 @@ target_sources(hal_tiva.instantiations PRIVATE
     EventInfrastructure.cpp
     EventInfrastructure.hpp
     LaunchPadBsp.hpp
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C123>:LaunchPadBspEkTm4c123g.hpp>
+    $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:LaunchPadBspEkTm4c1294.hpp>
     TracerInfrastructure.cpp
     TracerInfrastructure.hpp
     TracingReset.cpp
