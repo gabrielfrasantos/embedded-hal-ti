@@ -114,6 +114,14 @@ namespace
     constexpr const uint32_t SYSCTL_RIS_BOR1RIS = 0x00000002;  // VDD under BOR1 Raw Interrupt Status
     constexpr const uint32_t SYSCTL_RIS_BORRIS = 0x00000002;  // Brown-Out Reset Raw Interrupt Status
 
+    constexpr const uint32_t SYSCTL_MOSC_VALIDATE = 0x00000001;  // Enable MOSC validation
+    constexpr const uint32_t SYSCTL_MOSC_INTERRUPT = 0x00000002;  // Generate interrupt on MOSC fail
+    constexpr const uint32_t SYSCTL_MOSC_NO_XTAL = 0x00000004;  // No crystal is attached to MOSC
+    constexpr const uint32_t SYSCTL_MOSC_PWR_DIS = 0x00000008;  // Power down the MOSC.
+    constexpr const uint32_t SYSCTL_MOSC_LOWFREQ = 0x00000000;  // MOSC is less than 10MHz
+    constexpr const uint32_t SYSCTL_MOSC_HIGHFREQ = 0x00000010;  // MOSC is greater than 10MHz
+    constexpr const uint32_t SYSCTL_MOSC_SESRC = 0x00000020;  // Singled ended oscillator source.
+
     const std::array<uint32_t, 27> crystalLookupTable = { {
         1000000,
         1843200,
@@ -384,6 +392,8 @@ namespace hal::tiva
         uint32_t oscillator = 0;
         uint32_t oscillatorSelection = 0;
         uint32_t crystalIndex = CrystalToIndexArray(hseValue);
+
+        SYSCTL->MOSCCTL = SYSCTL_MOSC_HIGHFREQ;
 
         switch (oscSource)
         {
