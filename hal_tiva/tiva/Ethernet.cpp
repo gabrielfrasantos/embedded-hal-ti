@@ -653,20 +653,22 @@ namespace hal::tiva
                 Interrupt();
             })
     {
-        EnableEMACClock();
-        ResetEMACClock();
+        {
+            EnableEMACClock();
+            ResetEMACClock();
 
-        really_assert(IsEPHYPresent());
+            really_assert(IsEPHYPresent());
 
-        EnableEPHYClock();
-        ResetEPHYClock();
+            EnableEPHYClock();
+            ResetEPHYClock();
 
-        while (!IsEMACReady());
+            while (!IsEMACReady());
 
-        SelectPhy(phySelection, linkSpeed);
-        InitializeEthernetMac(EMAC_BCONFIG_MIXED_BURST | EMAC_BCONFIG_PRIORITY_FIXED, 4, 4, 0);
-        ConfigureEthernetMac(EMAC_CONFIG, EMAC_MODE, 0);
-        SetMacAddress(macAddress);
+            SelectPhy(phySelection, linkSpeed);
+            InitializeEthernetMac(EMAC_BCONFIG_MIXED_BURST | EMAC_BCONFIG_PRIORITY_FIXED, 4, 4, 0);
+            ConfigureEthernetMac(EMAC_CONFIG, EMAC_MODE, 0);
+            SetMacAddress(macAddress);
+        }
 
         receiveDescriptors.Emplace(*this);
         sendDescriptors.Emplace(*this);
