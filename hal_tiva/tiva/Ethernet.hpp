@@ -6,8 +6,6 @@
 #include "hal/interfaces/Ethernet.hpp"
 #include "hal/interfaces/MacAddress.hpp"
 #include "hal_tiva/tiva/Gpio.hpp"
-#include "infra/timer/Timer.hpp"
-#include "infra/util/Sequencer.hpp"
 
 namespace hal::tiva
 {
@@ -16,6 +14,13 @@ namespace hal::tiva
         , public hal::EthernetMac
     {
     public:
+        struct Leds
+        {
+            GpioPin& led0 = dummyPin;
+            GpioPin& led1 = dummyPin;
+            GpioPin& led2 = dummyPin;
+        };
+
         enum class PhySelection : uint32_t
         {
             internal = 0,
@@ -23,7 +28,7 @@ namespace hal::tiva
             externalRmii = 0xC0000000
         };
 
-        Ethernet(PhySelection phySelection, hal::LinkSpeed linkSpeed, hal::MacAddress macAddress);
+        Ethernet(Leds leds, PhySelection phySelection, hal::LinkSpeed linkSpeed, hal::MacAddress macAddress);
         ~Ethernet();
 
         void SendBuffer(infra::ConstByteRange data, bool last) override;
@@ -94,8 +99,6 @@ namespace hal::tiva
             bool sendFirst = true;
         };
 
-        void InitilizeLeds();
-
         void EnableEMACClock() const;
         void ResetEMACClock() const;
         bool IsEMACReady() const;
@@ -127,6 +130,9 @@ namespace hal::tiva
         void SetEthernetMacConfiguration(uint32_t config, uint32_t mode, uint32_t maxRxFrameSize);
         void ConfigureLPITimers(bool config, uint16_t lsTimerInMs, uint16_t twTimerInMs);
 
+        PeripheralPin led0;
+        PeripheralPin led1;
+        PeripheralPin led2;
         uint8_t phyId = 0;
         volatile bool EEELinkActive = false;
         DispatchedInterruptHandler interrupt;

@@ -42,6 +42,9 @@ namespace hal::tiva
         qeiIndex,
         qeiPhaseA,
         qeiPhaseB,
+        ethernetLed0,
+        ethernetLed1,
+        ethernetLed2,
     };
 
     enum class Type : uint8_t

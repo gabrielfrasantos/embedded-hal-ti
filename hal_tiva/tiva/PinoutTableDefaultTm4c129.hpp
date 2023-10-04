@@ -16,6 +16,7 @@ namespace hal::tiva
     extern const infra::MemoryRange<const Gpio::PinoutTable> pinoutTableCan;
     extern const infra::MemoryRange<const Gpio::PinoutTable> pinoutTablePwm;
     extern const infra::MemoryRange<const Gpio::PinoutTable> pinoutTableUsb;
+    extern const infra::MemoryRange<const Gpio::PinoutTable> pinoutTableEthernet;
 }
 
 #endif

@@ -428,6 +428,54 @@ namespace hal::tiva
 
     constexpr infra::MemoryRange<const Gpio::PinoutTable> pinoutTablePwm = pinoutTablePwmArray;
 
+    constexpr std::array<const Gpio::PinPosition, 2> pinoutTableEthernetLed0Pins =
+    {{
+        { 0, Port::F, 0, 0x05 },
+        { 0, Port::K, 4, 0x05 },
+    }};
+
+    constexpr std::array<const Gpio::PinPosition, 2> pinoutTableEthernetLed1Pins =
+    {{
+        { 0, Port::F, 4, 0x05 },
+        { 0, Port::K, 6, 0x05 },
+    }};
+
+    constexpr std::array<const Gpio::PinPosition, 2> pinoutTableEthernetLed2Pins =
+    {{
+        { 0, Port::F, 1, 0x05 },
+        { 0, Port::K, 5, 0x05 },
+    }};
+
+    constexpr std::array<const Gpio::PinoutTable, 3> pinoutTableEthernetArray =
+    {{
+        {
+            PinConfigPeripheral::ethernetLed0,
+            pinoutTableEthernetLed0Pins,
+            Drive::None,
+            hal::PinConfigType::input,
+            Current::_8mA,
+            true,
+        },
+        {
+            PinConfigPeripheral::ethernetLed1,
+            pinoutTableEthernetLed1Pins,
+            Drive::None,
+            hal::PinConfigType::output,
+            Current::_8mA,
+            true,
+        },
+        {
+            PinConfigPeripheral::ethernetLed2,
+            pinoutTableEthernetLed2Pins,
+            Drive::None,
+            hal::PinConfigType::output,
+            Current::_8mA,
+            true,
+        },
+    }};
+
+    constexpr infra::MemoryRange<const Gpio::PinoutTable> pinoutTableEthernet = pinoutTableEthernetArray;
+
     constexpr std::array<const infra::MemoryRange<const Gpio::PinoutTable>, 6> pinoutTableDefaultArray = { pinoutTableUart, pinoutTableSpi, pinoutTableI2c, pinoutTableCan, pinoutTablePwm, pinoutTableQei };
     constexpr infra::MemoryRange<const infra::MemoryRange<const Gpio::PinoutTable>> pinoutTableDefault = pinoutTableDefaultArray;
     constexpr std::array<const Gpio::AnalogPinPosition, 20> analogTableDefaultArray =

@@ -643,15 +643,16 @@ namespace
 
 namespace hal::tiva
 {
-    Ethernet::Ethernet(PhySelection phySelection, hal::LinkSpeed linkSpeed, hal::MacAddress macAddress)
-        : phyId(phySelection == PhySelection::internal ? 0 : 1)
+    Ethernet::Ethernet(Leds leds, PhySelection phySelection, hal::LinkSpeed linkSpeed, hal::MacAddress macAddress)
+        : led0{ leds.led0, PinConfigPeripheral::ethernetLed0 }
+        , led1{ leds.led1, PinConfigPeripheral::ethernetLed1 }
+        , led2{ leds.led2, PinConfigPeripheral::ethernetLed2 }
+        , phyId(phySelection == PhySelection::internal ? 0 : 1)
         , interrupt(EMAC0_IRQn, [this]()
             {
                 Interrupt();
             })
     {
-        InitilizeLeds();
-
         EnableEMACClock();
         ResetEMACClock();
 
@@ -696,7 +697,8 @@ namespace hal::tiva
 
     Ethernet::~Ethernet()
     {
-
+        EMAC0->DMABUSMOD |= EMAC_DMABUSMOD_SWR;
+        while (EMAC0->DMABUSMOD & EMAC_DMABUSMOD_SWR);
     }
 
     void Ethernet::SendBuffer(infra::ConstByteRange data, bool last)
@@ -711,12 +713,50 @@ namespace hal::tiva
 
     void Ethernet::AddMacAddressFilter(hal::MacAddress address)
     {
+        auto lr = reinterpret_cast<const uint32_t*>(address.data())[0];
+        auto hr = (reinterpret_cast<const uint32_t*>(address.data())[1] & 0xffff) | (1 << 31);
 
+        if ((EMAC0->ADDR1H & infra::Bit<uint32_t>(31)) == 0)
+        {
+            EMAC0->ADDR1L = lr;
+            EMAC0->ADDR1H = hr;
+        }
+        else if ((EMAC0->ADDR2H & infra::Bit<uint32_t>(31)) == 0)
+        {
+            EMAC0->ADDR2L = lr;
+            EMAC0->ADDR2H = hr;
+        }
+        else if ((EMAC0->ADDR3H & infra::Bit<uint32_t>(31)) == 0)
+        {
+            EMAC0->ADDR3L = lr;
+            EMAC0->ADDR3H = hr;
+        }
+        else
+            abort();
     }
 
     void Ethernet::RemoveMacAddressFilter(hal::MacAddress address)
     {
+        auto lr = reinterpret_cast<const uint32_t*>(address.data())[0];
+        auto hr = (reinterpret_cast<const uint32_t*>(address.data())[1] & 0xffff) | (1 << 31);
 
+        if (EMAC0->ADDR1H == hr && EMAC0->ADDR1L == lr)
+        {
+            EMAC0->ADDR1L = 0;
+            EMAC0->ADDR1H = 0;
+        }
+        else if (EMAC0->ADDR2H == hr && EMAC0->ADDR2L == lr)
+        {
+            EMAC0->ADDR2L = 0;
+            EMAC0->ADDR2H = 0;
+        }
+        else if (EMAC0->ADDR3H == hr && EMAC0->ADDR3L == lr)
+        {
+            EMAC0->ADDR3L = 0;
+            EMAC0->ADDR3H = 0;
+        }
+        else
+            abort();
     }
 
     uint16_t Ethernet::PhyAddress() const
@@ -749,18 +789,6 @@ namespace hal::tiva
 
         if (status)
             ProcessInterrupt(status);
-    }
-
-    void Ethernet::InitilizeLeds()
-    {
-        #error "Initialize LEDS"
-
-        /*
-        MAP_GPIOPinConfigure(GPIO_PF0_EN0LED0);
-        MAP_GPIOPinConfigure(GPIO_PF4_EN0LED1);
-
-        MAP_GPIOPinTypeEthernetLED(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4);
-        */
     }
 
     void Ethernet::EnableEMACClock() const
