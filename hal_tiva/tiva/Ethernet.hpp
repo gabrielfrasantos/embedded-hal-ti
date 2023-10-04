@@ -14,7 +14,6 @@ namespace hal::tiva
     class Ethernet
         : public hal::EthernetSmi
         , public hal::EthernetMac
-        , private InterruptHandler
     {
     public:
         enum class PhySelection : uint32_t
@@ -33,8 +32,6 @@ namespace hal::tiva
         void RemoveMacAddressFilter(hal::MacAddress address) override;
 
         uint16_t PhyAddress() const override;
-
-        void Invoke() override;
 
     private:
         struct EMACDescriptor;
@@ -97,6 +94,8 @@ namespace hal::tiva
             bool sendFirst = true;
         };
 
+        void InitilizeLeds();
+
         void EnableEMACClock() const;
         void ResetEMACClock() const;
         bool IsEMACReady() const;
@@ -110,6 +109,7 @@ namespace hal::tiva
         void InitializeEthernetMac(uint32_t busConfig, uint32_t rxBurst, uint32_t txBurst, uint32_t descriptorSkipSize) const;
         void ConfigureEthernetMac(uint32_t configuration, uint32_t mode, uint32_t rxMaxFrameSize) const;
         void SetMacAddress(hal::MacAddress macAddress) const;
+        uint16_t ReadExtendedPhy(uint8_t phyAddress, uint16_t registerAddress);
         uint16_t ReadPhy(uint8_t phyAddress, uint8_t registerAddress) const;
         void WritePhy(uint8_t phyAddress, uint8_t registerAddress, uint16_t data) const;
         void SetMacFilter(uint32_t options) const;
@@ -120,7 +120,16 @@ namespace hal::tiva
         void EnableTxInterrupts() const;
         void EnableRxInterrupts() const;
         void EnableInterruptsSource(uint32_t options) const;
+        void ProcessInterrupt(uint32_t status);
+        void ProcessPhyInterrupt();
+        void Interrupt();
+        void GetEthernetMacConfiguration(uint32_t& config, uint32_t& mode, uint32_t& maxRxFrameSize);
+        void SetEthernetMacConfiguration(uint32_t config, uint32_t mode, uint32_t maxRxFrameSize);
+        void ConfigureLPITimers(bool config, uint16_t lsTimerInMs, uint16_t twTimerInMs);
 
+        uint8_t phyId = 0;
+        volatile bool EEELinkActive = false;
+        DispatchedInterruptHandler interrupt;
         infra::Optional<ReceiveDescriptors> receiveDescriptors;
         infra::Optional<SendDescriptors> sendDescriptors;
     };

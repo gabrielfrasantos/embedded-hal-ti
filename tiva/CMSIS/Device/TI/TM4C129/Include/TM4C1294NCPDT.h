@@ -1356,7 +1356,8 @@ typedef struct {                                    /*!< EMAC0 Structure        
   __IO uint32_t  STATUS;                            /*!< Ethernet MAC Status                                                   */
   __IO uint32_t  RWUFF;                             /*!< Ethernet MAC Remote Wake-Up Frame Filter                              */
   __IO uint32_t  PMTCTLSTAT;                        /*!< Ethernet MAC PMT Control and Status Register                          */
-  __I  uint32_t  RESERVED1[2];
+  __IO uint32_t  LPICTLSTAT;                        /*!< Ethernet MAC Low Power Idle Control and Status Register               */
+  __IO uint32_t  LPITIMERCTL;                       /*!< Ethernet MAC Low Power Idle Timer Control Register                    */
   __IO uint32_t  RIS;                               /*!< Ethernet MAC Raw Interrupt Status                                     */
   __IO uint32_t  IM;                                /*!< Ethernet MAC Interrupt Mask                                           */
   __IO uint32_t  ADDR0H;                            /*!< Ethernet MAC Address 0 High                                           */

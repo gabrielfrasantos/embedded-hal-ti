@@ -10,7 +10,7 @@
 namespace
 {
 #if defined(ewarm) || defined(DOXYGEN)
-    void Delay(uint32_t Desc1)
+    void Delay(uint32_t count)
     {
         __asm("    subs    r0, #1\n"
             "    bne.n   Delay\n"
@@ -18,7 +18,7 @@ namespace
     }
 #endif
 #if defined(codered) || defined(gcc) || defined(sourcerygxx) || defined(__GNUC__) || defined(__GNUG__)
-    void __attribute__((naked)) Delay(uint32_t Desc1)
+    void __attribute__((naked)) Delay(uint32_t count)
     {
         __asm("    subs    r0, #1\n"
             "    bne     Delay\n"
@@ -26,7 +26,7 @@ namespace
     }
 #endif
 #if defined(rvmdk) || defined(__ARMCC_VERSION)
-    __asm void Delay(uint32_t Desc1)
+    __asm void Delay(uint32_t count)
     {
         subs    r0, #1;
         bne     Delay;
@@ -294,6 +294,48 @@ namespace
 
     constexpr uint32_t EMAC_EPHYIM_INT = 0x00000001;  // Ethernet PHY Interrupt Mask
 
+    constexpr uint32_t EMAC_PMTCTLSTAT_WUPFRRST = 0x80000000;  // Wake-Up Frame Filter Register Pointer Reset
+    constexpr uint32_t EMAC_PMTCTLSTAT_RWKPTR_M = 0x07000000;  // Remote Wake-Up FIFO Pointer
+    constexpr uint32_t EMAC_PMTCTLSTAT_GLBLUCAST = 0x00000200;  // Global Unicast
+    constexpr uint32_t EMAC_PMTCTLSTAT_WUPRX = 0x00000040;  // Wake-Up Frame Received
+    constexpr uint32_t EMAC_PMTCTLSTAT_MGKPRX = 0x00000020;  // Magic Packet Received
+    constexpr uint32_t EMAC_PMTCTLSTAT_WUPFREN = 0x00000004;  // Wake-Up Frame Enable
+    constexpr uint32_t EMAC_PMTCTLSTAT_MGKPKTEN = 0x00000002;  // Magic Packet Enable
+    constexpr uint32_t EMAC_PMTCTLSTAT_PWRDWN = 0x00000001;  // Power Down
+    constexpr uint32_t EMAC_PMTCTLSTAT_RWKPTR_S = 24;
+
+    constexpr uint32_t EPHY_STS_MDIXM = 0x00004000;  // MDI-X Mode
+    constexpr uint32_t EPHY_STS_RXLERR = 0x00002000;  // Receive Error Latch
+    constexpr uint32_t EPHY_STS_POLSTAT = 0x00001000;  // Polarity Status
+    constexpr uint32_t EPHY_STS_FCSL = 0x00000800;  // False Carrier Sense Latch
+    constexpr uint32_t EPHY_STS_SD = 0x00000400;  // Signal Detect
+    constexpr uint32_t EPHY_STS_DL = 0x00000200;  // Descrambler Lock
+    constexpr uint32_t EPHY_STS_PAGERX = 0x00000100;  // Link Code Page Received
+    constexpr uint32_t EPHY_STS_MIIREQ = 0x00000080;  // MII Interrupt Pending
+    constexpr uint32_t EPHY_STS_RF = 0x00000040;  // Remote Fault
+    constexpr uint32_t EPHY_STS_JD = 0x00000020;  // Jabber Detect
+    constexpr uint32_t EPHY_STS_ANS = 0x00000010;  // Auto-Negotiation Status
+    constexpr uint32_t EPHY_STS_MIILB = 0x00000008;  // MII Loopback Status
+    constexpr uint32_t EPHY_STS_DUPLEX = 0x00000004;  // Duplex Status
+    constexpr uint32_t EPHY_STS_SPEED = 0x00000002;  // Speed Status
+    constexpr uint32_t EPHY_STS_LINK = 0x00000001;  // Link Status
+
+    constexpr uint32_t EMAC_LPITIMERCTL_LST_M = 0x03FF0000;  // Low Power Idle LS Timer
+    constexpr uint32_t EMAC_LPITIMERCTL_LST_S = 16;
+    constexpr uint32_t EMAC_LPITIMERCTL_TWT_M = 0x0000FFFF;  // Low Power Idle TW Timer
+    constexpr uint32_t EMAC_LPITIMERCTL_TWT_S = 0;
+
+    constexpr uint32_t EMAC_LPICTLSTAT_LPITXA = 0x00080000;  // LPI TX Automate
+    constexpr uint32_t EMAC_LPICTLSTAT_PLSEN = 0x00040000;  // PHY Link Status Enable
+    constexpr uint32_t EMAC_LPICTLSTAT_PLS = 0x00020000;  // PHY Link Status
+    constexpr uint32_t EMAC_LPICTLSTAT_LPIEN = 0x00010000;  // LPI Enable
+    constexpr uint32_t EMAC_LPICTLSTAT_RLPIST = 0x00000200;  // Receive LPI State
+    constexpr uint32_t EMAC_LPICTLSTAT_TLPIST = 0x00000100;  // Transmit LPI State
+    constexpr uint32_t EMAC_LPICTLSTAT_RLPIEX = 0x00000008;  // Receive LPI Exit
+    constexpr uint32_t EMAC_LPICTLSTAT_RLPIEN = 0x00000004;  // Receive LPI Entry
+    constexpr uint32_t EMAC_LPICTLSTAT_TLPIEX = 0x00000002;  // Transmit LPI Exit
+    constexpr uint32_t EMAC_LPICTLSTAT_TLPIEN = 0x00000001;  // Transmit LPI Entry
+
     constexpr uint32_t EMAC_BCONFIG_DMA_PRIO_WEIGHT_M = 0x30000000;
     constexpr uint32_t EMAC_BCONFIG_DMA_PRIO_WEIGHT_1 = 0x00000000;
     constexpr uint32_t EMAC_BCONFIG_DMA_PRIO_WEIGHT_2 = 0x10000000;
@@ -369,7 +411,7 @@ namespace
     constexpr uint32_t EMAC_MODE_RX_THRESHOLD_64_BYTES = (0 << 3);
     constexpr uint32_t EMAC_MODE_RX_THRESHOLD_32_BYTES = (1 << 3);
     constexpr uint32_t EMAC_MODE_RX_THRESHOLD_96_BYTES = (2 << 3);
-    constexpr uint32_t EMAC_MODE_RX_THRESHOLD_128_BYTES = (3 << 3);
+    constexpr uint32_t EMAC_MODE_RX_THRESHOLD_128_BYTES = 0x18;
     constexpr uint32_t EMAC_MODE_OPERATE_2ND_FRAME = 0x00000002;
 
     constexpr uint32_t DES0_TX_CTRL_OWN = 0x80000000;
@@ -498,6 +540,17 @@ namespace
     constexpr uint32_t EMAC_INT_NORMAL_INT = 0x00010000;
     constexpr uint32_t EMAC_INT_ABNORMAL_INT = 0x00008000;
 
+    constexpr uint32_t EMAC_INT_LPI = 0x40000000;
+    constexpr uint32_t EMAC_INT_TIMESTAMP = 0x20000000;
+    constexpr uint32_t EMAC_TS_INT_TARGET_REACHED = 0x00000002;
+    constexpr uint32_t EMAC_TS_INT_TS_SEC_OVERFLOW = 0x00000001;
+    constexpr uint32_t EMAC_INT_POWER_MGMNT = 0x10000000;
+
+    constexpr uint16_t phyAnlpaHalfDuplex10MHz = 5;
+    constexpr uint16_t phyAnlpaFullDuplex10MHz = 6;
+    constexpr uint16_t phyAnlpaHalfDuplex100MHz = 7;
+    constexpr uint16_t phyAnlpaFullDuplex100MHz = 8;
+
     const std::array<uint32_t, 4> toTivaLinkSpeed =
     {{
         EMAC_PHY_AN_10B_T_FULL_DUPLEX,  /* fullDuplex10MHz */
@@ -506,19 +559,19 @@ namespace
         EMAC_PHY_AN_100B_T_HALF_DUPLEX  /* halfDuplex100MHz */
     }};
 
-    static const struct
+    struct MiiClock
     {
         uint32_t systemClockMax;
         uint32_t divisor;
-    }
-    miiClockTable[] =
-    {
+    };
+
+    const std::array<MiiClock, 3> miiClockTable =
+    {{
         { 64000000, EMAC_MIIADDR_CR_35_60 },
         { 104000000, EMAC_MIIADDR_CR_60_100 },
         { 150000000, EMAC_MIIADDR_CR_100_150 }
-    };
+    }};
 
-    constexpr uint32_t NUM_CLOCK_DIVISORS = (sizeof(miiClockTable) / sizeof(miiClockTable[0]));
     constexpr uint32_t VALID_CONFIG_FLAGS = (EMAC_CONFIG_USE_MACADDR1 |                   \
                                  EMAC_CONFIG_SA_INSERT |                      \
                                  EMAC_CONFIG_SA_REPLACE |                     \
@@ -576,12 +629,29 @@ namespace
 
     constexpr uint32_t EMAC_CONFIG = (EMAC_CONFIG_FULL_DUPLEX | EMAC_CONFIG_CHECKSUM_OFFLOAD | EMAC_CONFIG_7BYTE_PREAMBLE | EMAC_CONFIG_IF_GAP_96BITS | EMAC_CONFIG_USE_MACADDR0 | EMAC_CONFIG_SA_FROM_DESCRIPTOR | EMAC_CONFIG_BO_LIMIT_1024);
     constexpr uint32_t EMAC_MODE = (EMAC_MODE_RX_STORE_FORWARD | EMAC_MODE_TX_STORE_FORWARD | EMAC_MODE_TX_THRESHOLD_64_BYTES | EMAC_MODE_RX_THRESHOLD_64_BYTES);
+
+    constexpr uint16_t DEV_ADDR(const uint16_t& address)
+    {
+        return ((address & 0xF000) >> 12);
+    }
+
+    constexpr uint16_t REG_ADDR(const uint16_t& address)
+    {
+        return ((address & 0x0FFF));
+    }
 }
 
 namespace hal::tiva
 {
     Ethernet::Ethernet(PhySelection phySelection, hal::LinkSpeed linkSpeed, hal::MacAddress macAddress)
+        : phyId(phySelection == PhySelection::internal ? 0 : 1)
+        , interrupt(EMAC0_IRQn, [this]()
+            {
+                Interrupt();
+            })
     {
+        InitilizeLeds();
+
         EnableEMACClock();
         ResetEMACClock();
 
@@ -590,7 +660,7 @@ namespace hal::tiva
         EnableEPHYClock();
         ResetEPHYClock();
 
-        while(!IsEMACReady());
+        while (!IsEMACReady());
 
         SelectPhy(phySelection, linkSpeed);
         InitializeEthernetMac(EMAC_BCONFIG_MIXED_BURST | EMAC_BCONFIG_PRIORITY_FIXED, 4, 4, 0);
@@ -600,14 +670,14 @@ namespace hal::tiva
         receiveDescriptors.Emplace(*this);
         sendDescriptors.Emplace(*this);
 
-        ReadPhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_MISR1);
-        ReadPhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_MISR2);
+        ReadPhy(phyId, EPHY_MISR1);
+        ReadPhy(phyId, EPHY_MISR2);
 
-        uint16_t enableLinkStatus = ReadPhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_SCR) | (EPHY_SCR_INTEN_EXT | EPHY_SCR_INTOE_EXT);
-        WritePhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_SCR, enableLinkStatus);
-        WritePhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_MISR1, (EPHY_MISR1_LINKSTATEN | EPHY_MISR1_SPEEDEN | EPHY_MISR1_DUPLEXMEN | EPHY_MISR1_ANCEN));
+        uint16_t enableLinkStatus = ReadPhy(phyId, EPHY_SCR) | (EPHY_SCR_INTEN_EXT | EPHY_SCR_INTOE_EXT);
+        WritePhy(phyId, EPHY_SCR, enableLinkStatus);
+        WritePhy(phyId, EPHY_MISR1, (EPHY_MISR1_LINKSTATEN | EPHY_MISR1_SPEEDEN | EPHY_MISR1_DUPLEXMEN | EPHY_MISR1_ANCEN));
 
-        ReadPhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_MISR1);
+        ReadPhy(phyId, EPHY_MISR1);
 
         SetMacFilter(EMAC_FRMFILTER_HASH_AND_PERFECT | EMAC_FRMFILTER_PASS_MULTICAST);
 
@@ -621,9 +691,7 @@ namespace hal::tiva
 
         EnableInterruptsSource(EMAC_INT_RECEIVE | EMAC_INT_TRANSMIT | EMAC_INT_TX_STOPPED | EMAC_INT_RX_NO_BUFFER | EMAC_INT_RX_STOPPED | EMAC_INT_PHY);
 
-        Register(EMAC0_IRQn);
-
-        WritePhy(phySelection == PhySelection::internal ? 0 : 1, EPHY_BMCR, (EPHY_BMCR_ANEN | EPHY_BMCR_RESTARTAN));
+        WritePhy(phyId, EPHY_BMCR, (EPHY_BMCR_ANEN | EPHY_BMCR_RESTARTAN));
     }
 
     Ethernet::~Ethernet()
@@ -656,9 +724,43 @@ namespace hal::tiva
         return 0;
     }
 
-    void Ethernet::Invoke()
+    void Ethernet::Interrupt()
     {
+        auto status = GetInterruptStatus(true);
 
+        if (status & EMAC_INT_LPI)
+            auto content = EMAC0->PMTCTLSTAT;
+
+        if (status & EMAC_INT_POWER_MGMNT)
+        {
+            EnableTxInterrupts();
+            EnableRxInterrupts();
+
+            auto content = EMAC0->PMTCTLSTAT & (EMAC_PMTCTLSTAT_WUPRX | EMAC_PMTCTLSTAT_MGKPRX | EMAC_PMTCTLSTAT_PWRDWN);
+
+            status &= ~EMAC_INT_POWER_MGMNT;
+        }
+
+        if (status)
+            ClearInterruptPending(status);
+
+        if (status & EMAC_INT_TIMESTAMP)
+            auto content = EMAC0->TIMSTAT;
+
+        if (status)
+            ProcessInterrupt(status);
+    }
+
+    void Ethernet::InitilizeLeds()
+    {
+        #error "Initialize LEDS"
+
+        /*
+        MAP_GPIOPinConfigure(GPIO_PF0_EN0LED0);
+        MAP_GPIOPinConfigure(GPIO_PF4_EN0LED1);
+
+        MAP_GPIOPinTypeEthernetLED(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_4);
+        */
     }
 
     void Ethernet::EnableEMACClock() const
@@ -670,7 +772,7 @@ namespace hal::tiva
     {
         infra::ReplaceBit(SYSCTL->SREMAC, true, 0);
 
-        for(uint32_t delay = 0; delay < 16; delay++) {}
+        for(uint32_t delay = 0; delay < 16; delay++);
 
         infra::ReplaceBit(SYSCTL->SREMAC, false, 0);
     }
@@ -689,7 +791,7 @@ namespace hal::tiva
     {
         infra::ReplaceBit(SYSCTL->SREPHY, true, 0);
 
-        for(uint32_t delay = 0; delay < 16; delay++) {}
+        for(uint32_t delay = 0; delay < 16; delay++);
 
         infra::ReplaceBit(SYSCTL->SREPHY, false, 0);
     }
@@ -727,7 +829,7 @@ namespace hal::tiva
     void Ethernet::ResetEthernetMac() const
     {
         EMAC0->DMABUSMOD |= EMAC_DMABUSMOD_SWR;
-        while(EMAC0->DMABUSMOD & EMAC_DMABUSMOD_SWR);
+        while (EMAC0->DMABUSMOD & EMAC_DMABUSMOD_SWR);
     }
 
     void Ethernet::InitializeEthernetMac(uint32_t busConfig, uint32_t rxBurst, uint32_t txBurst, uint32_t descriptorSkipSize) const
@@ -757,9 +859,9 @@ namespace hal::tiva
 
         EMAC0->DMABUSMOD = dmaBusMode;
 
-        auto divisor = miiClockTable[NUM_CLOCK_DIVISORS - 1].divisor;
+        auto divisor = miiClockTable.back().divisor;
 
-        for (uint32_t i = 0; i < NUM_CLOCK_DIVISORS; i++)
+        for (uint32_t i = 0; i < miiClockTable.size(); i++)
         {
             if (SystemCoreClock <= miiClockTable[i].systemClockMax)
             {
@@ -780,7 +882,7 @@ namespace hal::tiva
 
         EMAC0->CFG = ((EMAC0->CFG) & ~VALID_CONFIG_FLAGS) | configuration | EMAC_CFG_PS;
 
-        if(rxMaxFrameSize)
+        if (rxMaxFrameSize)
             EMAC0->WDOGTO = rxMaxFrameSize | EMAC_WDOGTO_PWE;
         else
             EMAC0->WDOGTO &= ~EMAC_WDOGTO_PWE;
@@ -794,11 +896,22 @@ namespace hal::tiva
         EMAC0->ADDR0L = macAddress[0] | (macAddress[1] << 8) | (macAddress[2] << 16) | (macAddress[3] << 24); //NOSONAR
     }
 
+    uint16_t Ethernet::ReadExtendedPhy(uint8_t phyAddress, uint16_t registerAddress)
+    {
+        really_assert(phyAddress < 32);
+
+        WritePhy(phyAddress, EPHY_REGCTL, DEV_ADDR(registerAddress));
+        WritePhy(phyAddress, EPHY_ADDAR,  REG_ADDR(registerAddress));
+        WritePhy(phyAddress, EPHY_REGCTL, (0x4000 | DEV_ADDR(registerAddress)));
+
+        return ReadPhy(phyAddress, EPHY_ADDAR);
+    }
+
     uint16_t Ethernet::ReadPhy(uint8_t phyAddress, uint8_t registerAddress) const
     {
         really_assert(phyAddress < 32);
 
-        while(EMAC0->MIIADDR & EMAC_MIIADDR_MIIB);
+        while (EMAC0->MIIADDR & EMAC_MIIADDR_MIIB);
 
         EMAC0->MIIADDR = ((EMAC0->MIIADDR & EMAC_MIIADDR_CR_M) | (registerAddress << EMAC_MIIADDR_MII_S) | (phyAddress << EMAC_MIIADDR_PLA_S) | EMAC_MIIADDR_MIIB); //NOSONAR
 
@@ -811,7 +924,7 @@ namespace hal::tiva
     {
         really_assert(phyAddress < 32);
 
-        while(EMAC0->MIIADDR & EMAC_MIIADDR_MIIB);
+        while (EMAC0->MIIADDR & EMAC_MIIADDR_MIIB);
 
         EMAC0->MIIDATA = data;
         EMAC0->MIIADDR = ((EMAC0->MIIADDR & EMAC_MIIADDR_CR_M) | (registerAddress << EMAC_MIIADDR_MII_S) | (phyAddress << EMAC_MIIADDR_PLA_S) | EMAC_MIIADDR_MIIW | EMAC_MIIADDR_MIIB); //NOSONAR
@@ -845,16 +958,16 @@ namespace hal::tiva
 
     void Ethernet::ClearInterruptPending(uint32_t flags) const
     {
-        if(flags & EMAC_NORMAL_INTS)
+        if (flags & EMAC_NORMAL_INTS)
             flags |= EMAC_INT_NORMAL_INT;
 
-        if(flags & EMAC_ABNORMAL_INTS)
+        if (flags & EMAC_ABNORMAL_INTS)
             flags |= EMAC_INT_ABNORMAL_INT;
 
-        if(flags & ~EMAC_INT_PHY)
+        if (flags & ~EMAC_INT_PHY)
             EMAC0->DMARIS = (flags & ~EMAC_INT_PHY);
 
-        if(flags & EMAC_INT_PHY)
+        if (flags & EMAC_INT_PHY)
             EMAC0->EPHYMISC |= EMAC_EPHYMISC_INT;
     }
 
@@ -891,17 +1004,137 @@ namespace hal::tiva
 
     void Ethernet::EnableInterruptsSource(uint32_t options) const
     {
-        if(options & EMAC_NORMAL_INTS)
+        if (options & EMAC_NORMAL_INTS)
             options |= EMAC_INT_NORMAL_INT;
 
-        if(options & EMAC_ABNORMAL_INTS)
+        if (options & EMAC_ABNORMAL_INTS)
             options |= EMAC_INT_ABNORMAL_INT;
 
-        if(options & ~EMAC_INT_PHY)
+        if (options & ~EMAC_INT_PHY)
             EMAC0->DMAIM |= options & ~EMAC_INT_PHY;
 
-        if(options & EMAC_INT_PHY)
+        if (options & EMAC_INT_PHY)
             EMAC0->EPHYIM |= EMAC_EPHYIM_INT;
+    }
+
+    void Ethernet::GetEthernetMacConfiguration(uint32_t& config, uint32_t& mode, uint32_t& maxRxFrameSize)
+    {
+        config = EMAC0->DMAOPMODE;
+        mode = EMAC0->CFG & (VALID_CONFIG_FLAGS | EMAC_CONFIG_TX_ENABLED | EMAC_CONFIG_RX_ENABLED);
+        auto value = EMAC0->WDOGTO;
+
+        if (value & EMAC_WDOGTO_PWE)
+            maxRxFrameSize = value & EMAC_WDOGTO_WTO_M;
+        else
+            if (EMAC0->CFG & EMAC_CFG_JFEN)
+                maxRxFrameSize = 10240;
+            else
+                maxRxFrameSize = 2048;
+    }
+
+    void Ethernet::SetEthernetMacConfiguration(uint32_t config, uint32_t mode, uint32_t maxRxFrameSize)
+    {
+        EMAC0->CFG = (EMAC0->CFG & ~VALID_CONFIG_FLAGS) | config | EMAC_CFG_PS;
+
+        if (maxRxFrameSize)
+            EMAC0->WDOGTO = maxRxFrameSize | EMAC_WDOGTO_PWE;
+        else
+            EMAC0->WDOGTO &= ~EMAC_WDOGTO_PWE;
+
+        EMAC0->DMAOPMODE = mode;
+    }
+
+    void Ethernet::ConfigureLPITimers(bool config, uint16_t lsTimerInMs, uint16_t twTimerInMs)
+    {
+        auto timerValue = ((lsTimerInMs << EMAC_LPITIMERCTL_LST_S) & EMAC_LPITIMERCTL_LST_M) | twTimerInMs & EMAC_LPITIMERCTL_TWT_M;
+
+        EMAC0->LPITIMERCTL = timerValue;
+
+        if (config)
+            EMAC0->LPICTLSTAT |= EMAC_LPICTLSTAT_LPITXA;
+        else
+            EMAC0->LPICTLSTAT = 0;
+    }
+
+    void Ethernet::ProcessInterrupt(uint32_t status)
+    {
+        if (status & EMAC_INT_PHY)
+            ProcessPhyInterrupt();
+
+        if (status & EMAC_INT_TRANSMIT)
+        {
+            if (EEELinkActive)
+                EMAC0->LPICTLSTAT |= EMAC_LPICTLSTAT_LPIEN;
+
+            sendDescriptors->SentFrame();
+        }
+
+        if (status & (EMAC_INT_RECEIVE | EMAC_INT_RX_NO_BUFFER | EMAC_INT_RX_STOPPED))
+            receiveDescriptors->ReceivedFrame();
+    }
+
+    void Ethernet::ProcessPhyInterrupt()
+    {
+        auto interruptStatus = ReadPhy(phyId, EPHY_MISR1);
+        auto phyStatus = ReadPhy(phyId, EPHY_STS);
+        auto EEEStatus = ReadExtendedPhy(phyId, 0x703D);
+
+        if (interruptStatus & EPHY_MISR1_LINKSTAT)
+        {
+            if (phyStatus & EPHY_STS_LINK)
+            {
+                auto linkAbility = ReadPhy(phyId, EPHY_ANA);
+                auto linkPartnerAbility = ReadPhy(phyId, EPHY_ANLPA);
+
+                LinkSpeed speed;
+                if (infra::IsBitSet(linkPartnerAbility, phyAnlpaFullDuplex100MHz) && infra::IsBitSet(linkAbility, phyAnlpaFullDuplex100MHz))
+                    speed = LinkSpeed::fullDuplex100MHz;
+                else if (infra::IsBitSet(linkPartnerAbility, phyAnlpaHalfDuplex100MHz) && infra::IsBitSet(linkAbility, phyAnlpaHalfDuplex100MHz))
+                    speed = LinkSpeed::halfDuplex100MHz;
+                else if (infra::IsBitSet(linkPartnerAbility, phyAnlpaFullDuplex10MHz) && infra::IsBitSet(linkAbility, phyAnlpaFullDuplex10MHz))
+                    speed = LinkSpeed::fullDuplex10MHz;
+                else
+                    speed = LinkSpeed::halfDuplex10MHz;
+
+                EthernetSmi::GetObserver().LinkUp(speed);
+
+                if (EEEStatus & 0x2)
+                {
+                    ConfigureLPITimers(true, 1000, 36);
+                    EMAC0->LPICTLSTAT |= EMAC_LPICTLSTAT_PLS;
+                    EEELinkActive = true;
+                }
+            }
+            else
+            {
+                EthernetSmi::GetObserver().LinkDown();
+
+                EEELinkActive = false;
+                EMAC0->LPICTLSTAT &= ~EMAC_LPICTLSTAT_PLS;
+                ConfigureLPITimers(false, 1000, 0);
+            }
+        }
+
+        if (interruptStatus & (EPHY_MISR1_SPEED | EPHY_MISR1_SPEED | EPHY_MISR1_ANC))
+        {
+            uint32_t config = 0;
+            uint32_t mode = 0;
+            uint32_t maxRxFrameSize = 0;
+
+            GetEthernetMacConfiguration(config, mode, maxRxFrameSize);
+
+            if (phyStatus & EPHY_STS_SPEED)
+                config &= ~EMAC_CONFIG_100MBPS;
+            else
+                config |= EMAC_CONFIG_100MBPS;
+
+            if (phyStatus & EPHY_STS_DUPLEX)
+                config |= EMAC_CONFIG_FULL_DUPLEX;
+            else
+                config &= ~EMAC_CONFIG_FULL_DUPLEX;
+
+            SetEthernetMacConfiguration(config, mode, maxRxFrameSize);
+        }
     }
 
     Ethernet::ReceiveDescriptors::ReceiveDescriptors(Ethernet& ethernetMac)
@@ -931,7 +1164,7 @@ namespace hal::tiva
         while (receivedFramesAllocated != 0 && (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_CTRL_OWN) == 0)
         {
             bool receiveDone = (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_CTRL_OWN) == 0 && (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_STAT_LAST_DESC) != 0;
-            uint16_t frameSize = (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_STAT_FRAME_LENGTH_M) >> 16;
+            uint16_t frameSize = (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_STAT_FRAME_LENGTH_M) >> DES0_RX_STAT_FRAME_LENGTH_S;
             bool errorFrame = (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_STAT_ERR) != 0 && (descriptors[receiveDescriptorReceiveIndex].Desc0 & DES0_RX_STAT_LAST_DESC) != 0;
 
             descriptors[receiveDescriptorReceiveIndex].Desc2 = nullptr;
