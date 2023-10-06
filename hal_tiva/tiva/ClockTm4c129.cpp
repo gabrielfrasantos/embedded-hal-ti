@@ -169,7 +169,7 @@ namespace
         return ((q - 1) << SYSCTL_PLLFREQ1_Q_S);
     }
 
-    static const uint32_t pllFrequencyLookupTable[MAX_VCO_ENTRIES][MAX_XTAL_ENTRIES][3] =
+    const uint32_t pllFrequencyLookupTable[MAX_VCO_ENTRIES][MAX_XTAL_ENTRIES][3] =
     {
         {
             //
@@ -219,31 +219,32 @@ namespace
         },
     };
 
-    static const struct
+    struct systemClockMemoryTiming
     {
         uint32_t frequency;
         uint32_t memoryTiming;
-    }
-    systemClockMapLookupTable[] =
-    {
+    };
+
+    const std::array<systemClockMemoryTiming, 6> systemClockMapLookupTable =
+    {{
         { 16000000, (SYSCTL_MEMTIM0_FBCHT_0_5 | SYSCTL_MEMTIM0_FBCE | (0 << SYSCTL_MEMTIM0_FWS_S) | SYSCTL_MEMTIM0_EBCHT_0_5 | SYSCTL_MEMTIM0_EBCE | (0 << SYSCTL_MEMTIM0_EWS_S) | SYSCTL_MEMTIM0_MB1) },
         { 40000000, (SYSCTL_MEMTIM0_FBCHT_1_5 | (1 << SYSCTL_MEMTIM0_FWS_S) | SYSCTL_MEMTIM0_EBCHT_1_5 | (1 << SYSCTL_MEMTIM0_EWS_S) | SYSCTL_MEMTIM0_MB1) },
         { 60000000, (SYSCTL_MEMTIM0_FBCHT_2 | (2 << SYSCTL_MEMTIM0_FWS_S) | SYSCTL_MEMTIM0_EBCHT_2 | (2 << SYSCTL_MEMTIM0_EWS_S) | SYSCTL_MEMTIM0_MB1) },
         { 80000000, (SYSCTL_MEMTIM0_FBCHT_2_5 | (3 << SYSCTL_MEMTIM0_FWS_S) | SYSCTL_MEMTIM0_EBCHT_2_5 | (3 << SYSCTL_MEMTIM0_EWS_S) | SYSCTL_MEMTIM0_MB1) },
         { 100000000, (SYSCTL_MEMTIM0_FBCHT_3 | (4 << SYSCTL_MEMTIM0_FWS_S) | SYSCTL_MEMTIM0_EBCHT_3 | (4 << SYSCTL_MEMTIM0_EWS_S) | SYSCTL_MEMTIM0_MB1) },
         { 120000000, (SYSCTL_MEMTIM0_FBCHT_3_5 | (5 << SYSCTL_MEMTIM0_FWS_S) | SYSCTL_MEMTIM0_EBCHT_3_5 | (5 << SYSCTL_MEMTIM0_EWS_S) | SYSCTL_MEMTIM0_MB1) },
-    };
+    }};
 
-    static uint32_t GetMemoryTimings(uint32_t systemClock)
+    uint32_t GetMemoryTimings(uint32_t systemClock)
     {
-        for (uint_fast8_t index = 0; index < (sizeof(systemClockMapLookupTable) / sizeof(systemClockMapLookupTable[0])); index++)
+        for (uint_fast8_t index = 0; index < systemClockMapLookupTable.size(); index++)
             if (systemClock <= systemClockMapLookupTable[index].frequency)
                 return (systemClockMapLookupTable[index].memoryTiming);
 
-        return(0);
+        return 0;
     }
 
-    const uint32_t CalculateSystemFrequency(uint32_t crystal)
+    uint32_t CalculateSystemFrequency(uint32_t crystal)
     {
         uint32_t result;
 
@@ -264,7 +265,7 @@ namespace
         return result / static_cast<uint32_t>(q);
     }
 
-    const uint32_t vcoFrequenciesLookupTable[MAX_VCO_ENTRIES] =
+    const std::array<uint32_t, MAX_VCO_ENTRIES> vcoFrequenciesLookupTable =
     {
         160000000, // VCO 320
         240000000, // VCO 480
@@ -422,7 +423,7 @@ namespace hal::tiva
         else
             DisablePll(frequency, oscillator, oscillatorSelection);
 
-        SYSCTL->RSCLKCFG &= ~(SYSCTL_RSCLKCFG_OSCSRC_M);
+        SYSCTL->RSCLKCFG &= ~SYSCTL_RSCLKCFG_OSCSRC_M;
 
         SystemCoreClock = frequency;
     }
