@@ -4,6 +4,9 @@
 #include "hal_tiva/cortex/InterruptCortex.hpp"
 #include "infra/timer/TickOnInterruptTimerService.hpp"
 #include "infra/util/InterfaceConnector.hpp"
+#include <cstdint>
+
+extern "C" uint32_t HAL_GetTick();
 
 namespace hal::cortex
 {
@@ -15,9 +18,11 @@ namespace hal::cortex
     public:
         SystemTickTimerService(infra::Duration tickDuration = std::chrono::milliseconds(1), uint32_t id = infra::systemTimerServiceId);
 
-        virtual infra::TimePoint Now() const override;
+        infra::TimePoint Now() const override;
 
     private:
+        friend uint32_t HAL_GetTick();
+
         void Invoke() override;
     };
 }

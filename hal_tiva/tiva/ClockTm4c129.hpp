@@ -4,6 +4,11 @@
 #include DEVICE_HEADER
 #include <cstdint>
 
+extern "C"
+{
+    uint32_t HAL_GetTick(void);
+}
+
 namespace hal::tiva
 {
     enum class crystalFrequency : uint32_t
