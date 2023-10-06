@@ -10,7 +10,7 @@
 namespace
 {
 #if defined(ewarm) || defined(DOXYGEN)
-    void Delay(uint32_t count)
+    extern "C" void Delay(uint32_t count)
     {
         __asm("    subs    r0, #1\n"
             "    bne.n   Delay\n"
@@ -18,7 +18,7 @@ namespace
     }
 #endif
 #if defined(codered) || defined(gcc) || defined(sourcerygxx) || defined(__GNUC__) || defined(__GNUG__)
-    void __attribute__((naked)) Delay(uint32_t count)
+    extern "C" void __attribute__((naked)) Delay(uint32_t count)
     {
         __asm("    subs    r0, #1\n"
             "    bne     Delay\n"
@@ -26,7 +26,7 @@ namespace
     }
 #endif
 #if defined(rvmdk) || defined(__ARMCC_VERSION)
-    __asm void Delay(uint32_t count)
+    extern "C" __asm void Delay(uint32_t count)
     {
         subs    r0, #1;
         bne     Delay;
