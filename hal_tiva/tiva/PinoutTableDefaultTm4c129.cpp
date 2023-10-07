@@ -452,7 +452,7 @@ namespace hal::tiva
             PinConfigPeripheral::ethernetLed0,
             pinoutTableEthernetLed0Pins,
             Drive::None,
-            hal::PinConfigType::input,
+            hal::PinConfigType::output,
             Current::_8mA,
             true,
         },
@@ -476,7 +476,7 @@ namespace hal::tiva
 
     constexpr infra::MemoryRange<const Gpio::PinoutTable> pinoutTableEthernet = pinoutTableEthernetArray;
 
-    constexpr std::array<const infra::MemoryRange<const Gpio::PinoutTable>, 6> pinoutTableDefaultArray = { pinoutTableUart, pinoutTableSpi, pinoutTableI2c, pinoutTableCan, pinoutTablePwm, pinoutTableQei };
+    constexpr std::array<const infra::MemoryRange<const Gpio::PinoutTable>, 7> pinoutTableDefaultArray = { pinoutTableUart, pinoutTableSpi, pinoutTableI2c, pinoutTableCan, pinoutTablePwm, pinoutTableQei, pinoutTableEthernet };
     constexpr infra::MemoryRange<const infra::MemoryRange<const Gpio::PinoutTable>> pinoutTableDefault = pinoutTableDefaultArray;
     constexpr std::array<const Gpio::AnalogPinPosition, 20> analogTableDefaultArray =
     {{

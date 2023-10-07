@@ -6,6 +6,7 @@
 #include "hal/interfaces/Ethernet.hpp"
 #include "hal/interfaces/MacAddress.hpp"
 #include "hal_tiva/tiva/Gpio.hpp"
+#include "infra/util/Optional.hpp"
 
 namespace hal::tiva
 {
@@ -31,6 +32,7 @@ namespace hal::tiva
         Ethernet(Leds leds, PhySelection phySelection, hal::LinkSpeed linkSpeed, hal::MacAddress macAddress);
         ~Ethernet();
 
+        void Initialize() override;
         void SendBuffer(infra::ConstByteRange data, bool last) override;
         void RetryAllocation() override;
         void AddMacAddressFilter(hal::MacAddress address) override;
@@ -133,6 +135,7 @@ namespace hal::tiva
         PeripheralPin led0;
         PeripheralPin led1;
         PeripheralPin led2;
+        hal::MacAddress macAddress;
         uint8_t phyId = 0;
         volatile bool EEELinkActive = false;
         DispatchedInterruptHandler interrupt;

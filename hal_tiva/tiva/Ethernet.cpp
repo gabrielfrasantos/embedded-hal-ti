@@ -647,31 +647,27 @@ namespace hal::tiva
         : led0{ leds.led0, PinConfigPeripheral::ethernetLed0 }
         , led1{ leds.led1, PinConfigPeripheral::ethernetLed1 }
         , led2{ leds.led2, PinConfigPeripheral::ethernetLed2 }
+        , macAddress(macAddress)
         , phyId(phySelection == PhySelection::internal ? 0 : 1)
         , interrupt(EMAC0_IRQn, [this]()
             {
                 Interrupt();
             })
     {
-        {
-            EnableEMACClock();
-            ResetEMACClock();
+        EnableEMACClock();
+        ResetEMACClock();
 
-            really_assert(IsEPHYPresent());
+        really_assert(IsEPHYPresent());
 
-            EnableEPHYClock();
-            ResetEPHYClock();
+        EnableEPHYClock();
+        ResetEPHYClock();
 
-            while (!IsEMACReady());
+        while (!IsEMACReady());
 
-            SelectPhy(phySelection, linkSpeed);
-            InitializeEthernetMac(EMAC_BCONFIG_MIXED_BURST | EMAC_BCONFIG_PRIORITY_FIXED, 4, 4, 0);
-            ConfigureEthernetMac(EMAC_CONFIG, EMAC_MODE, 0);
-            SetMacAddress(macAddress);
-        }
-
-        receiveDescriptors.Emplace(*this);
-        sendDescriptors.Emplace(*this);
+        SelectPhy(phySelection, linkSpeed);
+        InitializeEthernetMac(EMAC_BCONFIG_MIXED_BURST | EMAC_BCONFIG_PRIORITY_FIXED, 4, 4, 0);
+        ConfigureEthernetMac(EMAC_CONFIG, EMAC_MODE, 0);
+        SetMacAddress(macAddress);
 
         ReadPhy(phyId, EPHY_MISR1);
         ReadPhy(phyId, EPHY_MISR2);
@@ -681,6 +677,18 @@ namespace hal::tiva
         WritePhy(phyId, EPHY_MISR1, (EPHY_MISR1_LINKSTATEN | EPHY_MISR1_SPEEDEN | EPHY_MISR1_DUPLEXMEN | EPHY_MISR1_ANCEN));
 
         ReadPhy(phyId, EPHY_MISR1);
+    }
+
+    Ethernet::~Ethernet()
+    {
+        EMAC0->DMABUSMOD |= EMAC_DMABUSMOD_SWR;
+        while (EMAC0->DMABUSMOD & EMAC_DMABUSMOD_SWR);
+    }
+
+    void Ethernet::Initialize()
+    {
+        receiveDescriptors.Emplace(*this);
+        sendDescriptors.Emplace(*this);
 
         SetMacFilter(EMAC_FRMFILTER_HASH_AND_PERFECT | EMAC_FRMFILTER_PASS_MULTICAST);
 
@@ -695,12 +703,6 @@ namespace hal::tiva
         EnableInterruptsSource(EMAC_INT_RECEIVE | EMAC_INT_TRANSMIT | EMAC_INT_TX_STOPPED | EMAC_INT_RX_NO_BUFFER | EMAC_INT_RX_STOPPED | EMAC_INT_PHY);
 
         WritePhy(phyId, EPHY_BMCR, (EPHY_BMCR_ANEN | EPHY_BMCR_RESTARTAN));
-    }
-
-    Ethernet::~Ethernet()
-    {
-        EMAC0->DMABUSMOD |= EMAC_DMABUSMOD_SWR;
-        while (EMAC0->DMABUSMOD & EMAC_DMABUSMOD_SWR);
     }
 
     void Ethernet::SendBuffer(infra::ConstByteRange data, bool last)
