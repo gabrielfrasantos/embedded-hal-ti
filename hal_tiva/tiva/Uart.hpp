@@ -59,7 +59,9 @@ namespace hal::tiva
 
         struct Config
         {
-            constexpr Config()
+            constexpr Config(bool enableTx = true, bool enableRx = true)
+                : enableTx(enableTx)
+                , enableRx(enableRx)
             {}
 
             bool enableTx = true;
@@ -72,8 +74,8 @@ namespace hal::tiva
             infra::Optional<InterruptPriority> priority;
         };
 
-        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, const Config& config = Config());
-        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, GpioPin& uartRts, GpioPin& uartCts, const Config& config = Config());
+        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, const Config& config = Config(true, true));
+        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, GpioPin& uartRts, GpioPin& uartCts, const Config& config = Config(true, true));
         ~Uart();
 
         virtual void SendData(infra::MemoryRange<const uint8_t> data, infra::Function<void()> actionOnCompletion = infra::emptyFunction) override;
