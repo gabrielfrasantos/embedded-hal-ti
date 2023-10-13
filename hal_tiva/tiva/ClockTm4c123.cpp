@@ -1,5 +1,5 @@
 #include DEVICE_HEADER
-#include "hal_tiva/tiva/Clock.hpp"
+#include "hal_tiva/tiva/ClockTm4c123.hpp"
 #include "infra/util/ReallyAssert.hpp"
 #include <array>
 
@@ -143,12 +143,6 @@ namespace
     constexpr const uint32_t SYSCTL_RCC_OSCSRC_30 = 0x00000030; // LFIOSC
     constexpr const uint32_t SYSCTL_RCC2_OSCSRC2_32 = 0x00000070; // 32.768 kHz
 
-    //*****************************************************************************
-    //
-    // The following are values that can be passed to the SysCtlClockSet() API as
-    // the ui32Config parameter.
-    //
-    //*****************************************************************************
     constexpr const uint32_t SYSCTL_SYSDIV_1 = 0x07800000; // Processor clock is osc/pll /1
     constexpr const uint32_t SYSCTL_SYSDIV_2 = 0x00C00000; // Processor clock is osc/pll /2
     constexpr const uint32_t SYSCTL_SYSDIV_3 = 0x01400000; // Processor clock is osc/pll /3
@@ -314,13 +308,14 @@ namespace
     constexpr const uint32_t SYSCTL_INT_OSC_DIS = 0x00000002; // Disable internal oscillator
     constexpr const uint32_t SYSCTL_MAIN_OSC_DIS = 0x00000001; // Disable main oscillator
 
-    constexpr const uint32_t CLOCK_FREQ_PIOSC = (16000000UL); /* Internal Oscillator Frequency: 16 MHz             */
-    constexpr const uint32_t CLOCK_FREQ_PIOSC_4 = (4000000UL); /* PIOSC divided by 4 : 4 MHz                        */
-    constexpr const uint32_t CLOCK_FREQ_LFIOSC = (30000UL); /* Low Frequency Internal Oscillator: 30 KHz         */
-    constexpr const uint32_t CLOCK_FREQ_HIBOSC = (32768UL); /* External Hibernate Module Oscillator: 32768 Hz    */
-    constexpr const uint32_t CLOCK_FREQ_PLLOSC = (400000000UL); /* PLL Oscillator : 400 MHz                          */
-    constexpr const uint32_t CLOCK_FREQ_PLLOSC_2 = (200000000UL); /* PLL Oscillator divided by 2 : 200 MHz             */
-    constexpr const uint32_t CLOCK_FREQ_MAX = (80000000UL); /* Maximum processo clock : 80 MHz                   */
+    constexpr const uint32_t CLOCK_FREQ_PIOSC = (16000000UL); /* Internal Oscillator Frequency: 16 MHz */
+    constexpr const uint32_t CLOCK_FREQ_PIOSC_4 = (4000000UL); /* PIOSC divided by 4 : 4 MHz */
+    constexpr const uint32_t CLOCK_FREQ_LFIOSC = (30000UL); /* Low Frequency Internal Oscillator: 30 KHz */
+    constexpr const uint32_t CLOCK_FREQ_HIBOSC = (32768UL); /* External Hibernate Module Oscillator: 32768 Hz */
+    constexpr const uint32_t CLOCK_FREQ_PLLOSC = (400000000UL); /* PLL Oscillator : 400 MHz */
+    constexpr const uint32_t CLOCK_FREQ_PLLOSC_2 = (200000000UL); /* PLL Oscillator divided by 2 : 200 MHz */
+    constexpr const uint32_t CLOCK_FREQ_MAX = (80000000UL); /* Maximum processo clock : 80 MHz */
+    // NOLINTEND
 
     const std::array<uint32_t, 32> crystalLookupTable = { {
         0, /*  0 */
@@ -473,7 +468,7 @@ namespace
     }
 
     bool IsPllInUse(uint32_t& rcc, uint32_t& rcc2)
-    {        
+    {
         return (((rcc2 & SYSCTL_RCC2_USERCC2_B) != 0 && (rcc2 & SYSCTL_RCC2_BYPASS2_B) == 0) || ((rcc2 & SYSCTL_RCC2_USERCC2_B) == 0 && (rcc & SYSCTL_RCC_BYPASS_B) == 0));
     }
 
@@ -507,7 +502,7 @@ namespace
     {
         if ((rcc2 & SYSCTL_RCC2_USERCC2_B) != 0)
         {
-            if ((rcc2 & SYSCTL_RCC2_DIV400_B) != 0 && (((rcc2 & SYSCTL_RCC2_USERCC2_B) != 0 && (rcc2 & SYSCTL_RCC2_BYPASS2_B) == 0) || 
+            if ((rcc2 & SYSCTL_RCC2_DIV400_B) != 0 && (((rcc2 & SYSCTL_RCC2_USERCC2_B) != 0 && (rcc2 & SYSCTL_RCC2_BYPASS2_B) == 0) ||
                ((rcc2 & SYSCTL_RCC2_USERCC2_B) == 0 && (rcc & SYSCTL_RCC_BYPASS_B) == 0)))
 
             {

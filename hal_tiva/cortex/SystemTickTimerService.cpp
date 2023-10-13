@@ -35,3 +35,11 @@ namespace hal::cortex
         SystemTickInterrupt();
     }
 }
+
+extern "C" uint32_t HAL_GetTick()
+{
+    if (hal::cortex::SystemTickTimerService::InstanceSet())
+        return std::chrono::duration_cast<std::chrono::milliseconds>(hal::cortex::SystemTickTimerService::Instance().Now().time_since_epoch()).count();
+    else
+        return 0;
+}

@@ -2,6 +2,12 @@
 #include "infra/event/EventDispatcher.hpp"
 #include "infra/util/BitLogic.hpp"
 
+#if defined(TM4C129)
+#define NUMBER_OF_PWM   1
+#else
+#define NUMBER_OF_PWM   2
+#endif
+
 namespace hal::tiva
 {
     namespace
@@ -282,6 +288,16 @@ namespace hal::tiva
         constexpr const uint32_t SYSCTL_RCC_PWMDIV_32 = 0x00080000;  // PWM clock /32
         constexpr const uint32_t SYSCTL_RCC_PWMDIV_64 = 0x000A0000;  // PWM clock /64
 
+        constexpr const uint32_t PWM_CC_USEPWMDIV = 0x00000100;  // Use PWM Clock Divisor
+        constexpr const uint32_t PWM_CC_PWMDIV_M = 0x00000007;  // PWM Clock Divider
+        constexpr const uint32_t PWM_CC_PWMDIV_2 = 0x00000000;  // /2
+        constexpr const uint32_t PWM_CC_PWMDIV_4 = 0x00000001;  // /4
+        constexpr const uint32_t PWM_CC_PWMDIV_8 = 0x00000002;  // /8
+        constexpr const uint32_t PWM_CC_PWMDIV_16 = 0x00000003;  // /16
+        constexpr const uint32_t PWM_CC_PWMDIV_32 = 0x00000004;  // /32
+        constexpr const uint32_t PWM_CC_PWMDIV_64 = 0x00000005;  // /64
+
+#if defined(TM4C123)
         constexpr uint32_t ToRccPwmDiv(uint32_t multiplyFactor)
         {
             really_assert(multiplyFactor >= 2 && multiplyFactor <= 64 && multiplyFactor % 2 == 0);
@@ -297,11 +313,30 @@ namespace hal::tiva
                 default: std::abort();
             }
         }
+#else
+        constexpr uint32_t ToCcPwmDiv(uint32_t multiplyFactor)
+        {
+            really_assert(multiplyFactor >= 2 && multiplyFactor <= 64 && multiplyFactor % 2 == 0);
 
-        constexpr std::array<uint32_t, 2> peripheralPwmArray =
+            switch (multiplyFactor)
+            {
+                case 2: return PWM_CC_PWMDIV_2; break;
+                case 4: return PWM_CC_PWMDIV_4; break;
+                case 8: return PWM_CC_PWMDIV_8; break;
+                case 16: return PWM_CC_PWMDIV_16; break;
+                case 32: return PWM_CC_PWMDIV_32; break;
+                case 64: return PWM_CC_PWMDIV_64; break;
+                default: std::abort();
+            }
+        }
+#endif
+
+        constexpr std::array<uint32_t, NUMBER_OF_PWM> peripheralPwmArray =
         {{
             PWM0_BASE,
+#if defined(TM4C123)
             PWM1_BASE,
+#endif
         }};
 
         const infra::MemoryRange<PWM0_Type* const> peripheralPwm = infra::ReinterpretCastMemoryRange<PWM0_Type* const>(infra::MakeRange(peripheralPwmArray));
@@ -436,8 +471,11 @@ namespace hal::tiva
         peripheralFrequency = SystemCoreClock;
         really_assert(frequency > (SystemCoreClock / 2));
 
+#if defined(TM4C123)
         SYSCTL->RCC = (SYSCTL->RCC & ~(SYSCTL_RCC_PWMDIV_M | SYSCTL_RCC_USEPWMDIV));
-
+#else
+        pwmArray[pwmIndex]->CC = (pwmArray[pwmIndex]->CC & ~(PWM_CC_PWMDIV_M | PWM_CC_USEPWMDIV));
+#endif
         bool needToFixClock = frequency < (peripheralFrequency / 0xffff);
 
         while (needToFixClock)
@@ -452,7 +490,13 @@ namespace hal::tiva
         }
 
         if (needToFixClock)
+        {
+#if defined(TM4C123)
             SYSCTL->RCC |= SYSCTL_RCC_USEPWMDIV | ToRccPwmDiv(divisor);
+#else
+            pwmArray[pwmIndex]->CC |= PWM_CC_USEPWMDIV | ToCcPwmDiv(divisor);
+#endif
+        }
     }
 
     void Pwm::EnableClock()

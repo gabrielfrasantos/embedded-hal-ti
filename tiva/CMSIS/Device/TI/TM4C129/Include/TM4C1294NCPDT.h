@@ -8,26 +8,26 @@
  * @version  V12591
  * @date     19. February 2014
  *
- * @note     Generated with SVDConv V2.79v 
+ * @note     Generated with SVDConv V2.79v
  *           from CMSIS SVD File 'TM4C1294NCPDT.svd.xml' Version 12591,
  *
- * @par      
+ * @par
  *           Software License Agreement
- *           
+ *
  *           Texas Instruments (TI) is supplying this software for use solely and
  *           exclusively on TI's microcontroller products. The software is owned by
  *           TI and/or its suppliers, and is protected under applicable copyright
  *           laws. You may not combine this software with "viral" open-source
  *           software in order to form a larger program.
- *           
+ *
  *           THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
  *           NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
  *           NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  *           A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
  *           CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
  *           DAMAGES, FOR ANY REASON WHATSOEVER.
- *           
- *           
+ *
+ *
  *
  *******************************************************************************************************/
 
@@ -275,7 +275,7 @@ typedef struct {                                    /*!< SSI0 Structure         
 
 typedef struct {                                    /*!< UART0 Structure                                                       */
   __IO uint32_t  DR;                                /*!< UART Data                                                             */
-  
+
   union {
     __IO uint32_t  ECR_UART_ALT;                    /*!< UART Receive Status/Error Clear                                       */
     __IO uint32_t  RSR;                             /*!< UART Receive Status/Error Clear                                       */
@@ -315,7 +315,7 @@ typedef struct {                                    /*!< UART0 Structure        
 
 typedef struct {                                    /*!< I2C0 Structure                                                        */
   __IO uint32_t  MSA;                               /*!< I2C Master Slave Address                                              */
-  
+
   union {
     __IO uint32_t  MCS_I2C0_ALT;                    /*!< I2C Master Control/Status                                             */
     __IO uint32_t  MCS;                             /*!< I2C Master Control/Status                                             */
@@ -334,7 +334,7 @@ typedef struct {                                    /*!< I2C0 Structure         
   __IO uint32_t  MBCNT;                             /*!< I2C Master Burst Count                                                */
   __I  uint32_t  RESERVED1[498];
   __IO uint32_t  SOAR;                              /*!< I2C Slave Own Address                                                 */
-  
+
   union {
     __IO uint32_t  SCSR_I2C0_ALT;                   /*!< I2C Slave Control/Status                                              */
     __IO uint32_t  SCSR;                            /*!< I2C Slave Control/Status                                              */
@@ -667,7 +667,7 @@ typedef struct {                                    /*!< CAN0 Structure         
   __IO uint32_t  BRPE;                              /*!< CAN Baud Rate Prescaler Extension                                     */
   __I  uint32_t  RESERVED0;
   __IO uint32_t  IF1CRQ;                            /*!< CAN IF1 Command Request                                               */
-  
+
   union {
     __IO uint32_t  IF1CMSK_CAN0_ALT;                /*!< CAN IF1 Command Mask                                                  */
     __IO uint32_t  IF1CMSK;                         /*!< CAN IF1 Command Mask                                                  */
@@ -683,7 +683,7 @@ typedef struct {                                    /*!< CAN0 Structure         
   __IO uint32_t  IF1DB2;                            /*!< CAN IF1 Data B2                                                       */
   __I  uint32_t  RESERVED1[13];
   __IO uint32_t  IF2CRQ;                            /*!< CAN IF2 Command Request                                               */
-  
+
   union {
     __IO uint32_t  IF2CMSK_CAN0_ALT;                /*!< CAN IF2 Command Mask                                                  */
     __IO uint32_t  IF2CMSK;                         /*!< CAN IF2 Command Mask                                                  */
@@ -728,12 +728,12 @@ typedef struct {                                    /*!< USB0 Structure         
   __IO uint16_t  RXIS;                              /*!< USB Receive Interrupt Status                                          */
   __IO uint16_t  TXIE;                              /*!< USB Transmit Interrupt Enable                                         */
   __IO uint16_t  RXIE;                              /*!< USB Receive Interrupt Enable                                          */
-  
+
   union {
     __IO uint8_t   IS_USB0_ALT;                     /*!< USB General Interrupt Status                                          */
     __IO uint8_t   IS;                              /*!< USB General Interrupt Status                                          */
   };
-  
+
   union {
     __IO uint8_t   IE_USB0_ALT;                     /*!< USB Interrupt Enable                                                  */
     __IO uint8_t   IE;                              /*!< USB Interrupt Enable                                                  */
@@ -835,7 +835,7 @@ typedef struct {                                    /*!< USB0 Structure         
   __IO uint8_t   RXHUBPORT7;                        /*!< USB Receive Hub Port Endpoint 7                                       */
   __I  uint32_t  RESERVED22[16];
   __I  uint16_t  RESERVED23;
-  
+
   union {
     __O  uint8_t   CSRL0_USB0_ALT;                  /*!< USB Control and Status Endpoint 0 Low                                 */
     __O  uint8_t   CSRL0;                           /*!< USB Control and Status Endpoint 0 Low                                 */
@@ -848,224 +848,224 @@ typedef struct {                                    /*!< USB0 Structure         
   __IO uint8_t   NAKLMT;                            /*!< USB NAK Limit                                                         */
   __I  uint32_t  RESERVED26;
   __IO uint16_t  TXMAXP1;                           /*!< USB Maximum Transmit Data Endpoint 1                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL1_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 1 Low                        */
     __IO uint8_t   TXCSRL1;                         /*!< USB Transmit Control and Status Endpoint 1 Low                        */
   };
   __IO uint8_t   TXCSRH1;                           /*!< USB Transmit Control and Status Endpoint 1 High                       */
   __IO uint16_t  RXMAXP1;                           /*!< USB Maximum Receive Data Endpoint 1                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL1_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 1 Low                         */
     __IO uint8_t   RXCSRL1;                         /*!< USB Receive Control and Status Endpoint 1 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH1_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 1 High                        */
     __IO uint8_t   RXCSRH1;                         /*!< USB Receive Control and Status Endpoint 1 High                        */
   };
   __IO uint16_t  RXCOUNT1;                          /*!< USB Receive Byte Count Endpoint 1                                     */
   __IO uint8_t   TXTYPE1;                           /*!< USB Host Transmit Configure Type Endpoint 1                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL1_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 1                                 */
     __IO uint8_t   TXINTERVAL1;                     /*!< USB Host Transmit Interval Endpoint 1                                 */
   };
   __IO uint8_t   RXTYPE1;                           /*!< USB Host Configure Receive Type Endpoint 1                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL1_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 1                          */
     __IO uint8_t   RXINTERVAL1;                     /*!< USB Host Receive Polling Interval Endpoint 1                          */
   };
   __I  uint16_t  RESERVED27;
   __IO uint16_t  TXMAXP2;                           /*!< USB Maximum Transmit Data Endpoint 2                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL2_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 2 Low                        */
     __IO uint8_t   TXCSRL2;                         /*!< USB Transmit Control and Status Endpoint 2 Low                        */
   };
   __IO uint8_t   TXCSRH2;                           /*!< USB Transmit Control and Status Endpoint 2 High                       */
   __IO uint16_t  RXMAXP2;                           /*!< USB Maximum Receive Data Endpoint 2                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL2_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 2 Low                         */
     __IO uint8_t   RXCSRL2;                         /*!< USB Receive Control and Status Endpoint 2 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH2_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 2 High                        */
     __IO uint8_t   RXCSRH2;                         /*!< USB Receive Control and Status Endpoint 2 High                        */
   };
   __IO uint16_t  RXCOUNT2;                          /*!< USB Receive Byte Count Endpoint 2                                     */
   __IO uint8_t   TXTYPE2;                           /*!< USB Host Transmit Configure Type Endpoint 2                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL2_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 2                                 */
     __IO uint8_t   TXINTERVAL2;                     /*!< USB Host Transmit Interval Endpoint 2                                 */
   };
   __IO uint8_t   RXTYPE2;                           /*!< USB Host Configure Receive Type Endpoint 2                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL2_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 2                          */
     __IO uint8_t   RXINTERVAL2;                     /*!< USB Host Receive Polling Interval Endpoint 2                          */
   };
   __I  uint16_t  RESERVED28;
   __IO uint16_t  TXMAXP3;                           /*!< USB Maximum Transmit Data Endpoint 3                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL3_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 3 Low                        */
     __IO uint8_t   TXCSRL3;                         /*!< USB Transmit Control and Status Endpoint 3 Low                        */
   };
   __IO uint8_t   TXCSRH3;                           /*!< USB Transmit Control and Status Endpoint 3 High                       */
   __IO uint16_t  RXMAXP3;                           /*!< USB Maximum Receive Data Endpoint 3                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL3_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 3 Low                         */
     __IO uint8_t   RXCSRL3;                         /*!< USB Receive Control and Status Endpoint 3 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH3_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 3 High                        */
     __IO uint8_t   RXCSRH3;                         /*!< USB Receive Control and Status Endpoint 3 High                        */
   };
   __IO uint16_t  RXCOUNT3;                          /*!< USB Receive Byte Count Endpoint 3                                     */
   __IO uint8_t   TXTYPE3;                           /*!< USB Host Transmit Configure Type Endpoint 3                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL3_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 3                                 */
     __IO uint8_t   TXINTERVAL3;                     /*!< USB Host Transmit Interval Endpoint 3                                 */
   };
   __IO uint8_t   RXTYPE3;                           /*!< USB Host Configure Receive Type Endpoint 3                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL3_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 3                          */
     __IO uint8_t   RXINTERVAL3;                     /*!< USB Host Receive Polling Interval Endpoint 3                          */
   };
   __I  uint16_t  RESERVED29;
   __IO uint16_t  TXMAXP4;                           /*!< USB Maximum Transmit Data Endpoint 4                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL4_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 4 Low                        */
     __IO uint8_t   TXCSRL4;                         /*!< USB Transmit Control and Status Endpoint 4 Low                        */
   };
   __IO uint8_t   TXCSRH4;                           /*!< USB Transmit Control and Status Endpoint 4 High                       */
   __IO uint16_t  RXMAXP4;                           /*!< USB Maximum Receive Data Endpoint 4                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL4_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 4 Low                         */
     __IO uint8_t   RXCSRL4;                         /*!< USB Receive Control and Status Endpoint 4 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH4_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 4 High                        */
     __IO uint8_t   RXCSRH4;                         /*!< USB Receive Control and Status Endpoint 4 High                        */
   };
   __IO uint16_t  RXCOUNT4;                          /*!< USB Receive Byte Count Endpoint 4                                     */
   __IO uint8_t   TXTYPE4;                           /*!< USB Host Transmit Configure Type Endpoint 4                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL4_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 4                                 */
     __IO uint8_t   TXINTERVAL4;                     /*!< USB Host Transmit Interval Endpoint 4                                 */
   };
   __IO uint8_t   RXTYPE4;                           /*!< USB Host Configure Receive Type Endpoint 4                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL4_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 4                          */
     __IO uint8_t   RXINTERVAL4;                     /*!< USB Host Receive Polling Interval Endpoint 4                          */
   };
   __I  uint16_t  RESERVED30;
   __IO uint16_t  TXMAXP5;                           /*!< USB Maximum Transmit Data Endpoint 5                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL5_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 5 Low                        */
     __IO uint8_t   TXCSRL5;                         /*!< USB Transmit Control and Status Endpoint 5 Low                        */
   };
   __IO uint8_t   TXCSRH5;                           /*!< USB Transmit Control and Status Endpoint 5 High                       */
   __IO uint16_t  RXMAXP5;                           /*!< USB Maximum Receive Data Endpoint 5                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL5_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 5 Low                         */
     __IO uint8_t   RXCSRL5;                         /*!< USB Receive Control and Status Endpoint 5 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH5_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 5 High                        */
     __IO uint8_t   RXCSRH5;                         /*!< USB Receive Control and Status Endpoint 5 High                        */
   };
   __IO uint16_t  RXCOUNT5;                          /*!< USB Receive Byte Count Endpoint 5                                     */
   __IO uint8_t   TXTYPE5;                           /*!< USB Host Transmit Configure Type Endpoint 5                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL5_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 5                                 */
     __IO uint8_t   TXINTERVAL5;                     /*!< USB Host Transmit Interval Endpoint 5                                 */
   };
   __IO uint8_t   RXTYPE5;                           /*!< USB Host Configure Receive Type Endpoint 5                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL5_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 5                          */
     __IO uint8_t   RXINTERVAL5;                     /*!< USB Host Receive Polling Interval Endpoint 5                          */
   };
   __I  uint16_t  RESERVED31;
   __IO uint16_t  TXMAXP6;                           /*!< USB Maximum Transmit Data Endpoint 6                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL6_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 6 Low                        */
     __IO uint8_t   TXCSRL6;                         /*!< USB Transmit Control and Status Endpoint 6 Low                        */
   };
   __IO uint8_t   TXCSRH6;                           /*!< USB Transmit Control and Status Endpoint 6 High                       */
   __IO uint16_t  RXMAXP6;                           /*!< USB Maximum Receive Data Endpoint 6                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL6_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 6 Low                         */
     __IO uint8_t   RXCSRL6;                         /*!< USB Receive Control and Status Endpoint 6 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH6_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 6 High                        */
     __IO uint8_t   RXCSRH6;                         /*!< USB Receive Control and Status Endpoint 6 High                        */
   };
   __IO uint16_t  RXCOUNT6;                          /*!< USB Receive Byte Count Endpoint 6                                     */
   __IO uint8_t   TXTYPE6;                           /*!< USB Host Transmit Configure Type Endpoint 6                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL6_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 6                                 */
     __IO uint8_t   TXINTERVAL6;                     /*!< USB Host Transmit Interval Endpoint 6                                 */
   };
   __IO uint8_t   RXTYPE6;                           /*!< USB Host Configure Receive Type Endpoint 6                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL6_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 6                          */
     __IO uint8_t   RXINTERVAL6;                     /*!< USB Host Receive Polling Interval Endpoint 6                          */
   };
   __I  uint16_t  RESERVED32;
   __IO uint16_t  TXMAXP7;                           /*!< USB Maximum Transmit Data Endpoint 7                                  */
-  
+
   union {
     __IO uint8_t   TXCSRL7_USB0_ALT;                /*!< USB Transmit Control and Status Endpoint 7 Low                        */
     __IO uint8_t   TXCSRL7;                         /*!< USB Transmit Control and Status Endpoint 7 Low                        */
   };
   __IO uint8_t   TXCSRH7;                           /*!< USB Transmit Control and Status Endpoint 7 High                       */
   __IO uint16_t  RXMAXP7;                           /*!< USB Maximum Receive Data Endpoint 7                                   */
-  
+
   union {
     __IO uint8_t   RXCSRL7_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 7 Low                         */
     __IO uint8_t   RXCSRL7;                         /*!< USB Receive Control and Status Endpoint 7 Low                         */
   };
-  
+
   union {
     __IO uint8_t   RXCSRH7_USB0_ALT;                /*!< USB Receive Control and Status Endpoint 7 High                        */
     __IO uint8_t   RXCSRH7;                         /*!< USB Receive Control and Status Endpoint 7 High                        */
   };
   __IO uint16_t  RXCOUNT7;                          /*!< USB Receive Byte Count Endpoint 7                                     */
   __IO uint8_t   TXTYPE7;                           /*!< USB Host Transmit Configure Type Endpoint 7                           */
-  
+
   union {
     __IO uint8_t   TXINTERVAL7_USB0_ALT;            /*!< USB Host Transmit Interval Endpoint 7                                 */
     __IO uint8_t   TXINTERVAL7;                     /*!< USB Host Transmit Interval Endpoint 7                                 */
   };
   __IO uint8_t   RXTYPE7;                           /*!< USB Host Configure Receive Type Endpoint 7                            */
-  
+
   union {
     __IO uint8_t   RXINTERVAL7_USB0_ALT;            /*!< USB Host Receive Polling Interval Endpoint 7                          */
     __IO uint8_t   RXINTERVAL7;                     /*!< USB Host Receive Polling Interval Endpoint 7                          */
@@ -1256,14 +1256,14 @@ typedef struct {                                    /*!< EPI0 Structure         
   __IO uint32_t  BAUD;                              /*!< EPI Main Baud Rate                                                    */
   __IO uint32_t  BAUD2;                             /*!< EPI Main Baud Rate                                                    */
   __I  uint32_t  RESERVED0;
-  
+
   union {
     __IO uint32_t  SDRAMCFG_EPI_ALTSD;              /*!< EPI SDRAM Configuration                                               */
     __IO uint32_t  HB8CFG_EPI_ALT8;                 /*!< EPI Host-Bus 8 Configuration                                          */
     __IO uint32_t  HB16CFG_EPI_ALT16;               /*!< EPI Host-Bus 16 Configuration                                         */
     __IO uint32_t  GPCFG;                           /*!< EPI General-Purpose Configuration                                     */
   };
-  
+
   union {
     __IO uint32_t  HB16CFG2_EPI_ALT16;              /*!< EPI Host-Bus 16 Configuration 2                                       */
     __IO uint32_t  HB8CFG2_EPI_ALT8;                /*!< EPI Host-Bus 8 Configuration 2                                        */
@@ -1299,32 +1299,32 @@ typedef struct {                                    /*!< EPI0 Structure         
   __IO uint32_t  MIS;                               /*!< EPI Masked Interrupt Status                                           */
   __IO uint32_t  EISC;                              /*!< EPI Error and Interrupt Status and Clear                              */
   __I  uint32_t  RESERVED7[58];
-  
+
   union {
     __IO uint32_t  HB16CFG3_EPI_ALT16;              /*!< EPI Host-Bus 16 Configuration 3                                       */
     __IO uint32_t  HB8CFG3;                         /*!< EPI Host-Bus 8 Configuration 3                                        */
   };
-  
+
   union {
     __IO uint32_t  HB8CFG4_EPI_ALT8;                /*!< EPI Host-Bus 8 Configuration 4                                        */
     __IO uint32_t  HB16CFG4;                        /*!< EPI Host-Bus 16 Configuration 4                                       */
   };
-  
+
   union {
     __IO uint32_t  HB16TIME_EPI_ALT16;              /*!< EPI Host-Bus 16 Timing Extension                                      */
     __IO uint32_t  HB8TIME;                         /*!< EPI Host-Bus 8 Timing Extension                                       */
   };
-  
+
   union {
     __IO uint32_t  HB16TIME2_EPI_ALT16;             /*!< EPI Host-Bus 16 Timing Extension                                      */
     __IO uint32_t  HB8TIME2;                        /*!< EPI Host-Bus 8 Timing Extension                                       */
   };
-  
+
   union {
     __IO uint32_t  HB8TIME3_EPI_ALT8;               /*!< EPI Host-Bus 8 Timing Extension                                       */
     __IO uint32_t  HB16TIME3;                       /*!< EPI Host-Bus 16 Timing Extension                                      */
   };
-  
+
   union {
     __IO uint32_t  HB16TIME4;                       /*!< EPI Host-Bus 16 Timing Extension                                      */
     __IO uint32_t  HB8TIME4_EPI_ALT8;               /*!< EPI Host-Bus 8 Timing Extension                                       */
@@ -1356,7 +1356,8 @@ typedef struct {                                    /*!< EMAC0 Structure        
   __IO uint32_t  STATUS;                            /*!< Ethernet MAC Status                                                   */
   __IO uint32_t  RWUFF;                             /*!< Ethernet MAC Remote Wake-Up Frame Filter                              */
   __IO uint32_t  PMTCTLSTAT;                        /*!< Ethernet MAC PMT Control and Status Register                          */
-  __I  uint32_t  RESERVED1[2];
+  __IO uint32_t  LPICTLSTAT;                        /*!< Ethernet MAC Low Power Idle Control and Status Register               */
+  __IO uint32_t  LPITIMERCTL;                       /*!< Ethernet MAC Low Power Idle Timer Control Register                    */
   __IO uint32_t  RIS;                               /*!< Ethernet MAC Raw Interrupt Status                                     */
   __IO uint32_t  IM;                                /*!< Ethernet MAC Interrupt Mask                                           */
   __IO uint32_t  ADDR0H;                            /*!< Ethernet MAC Address 0 High                                           */
@@ -1430,6 +1431,9 @@ typedef struct {                                    /*!< EMAC0 Structure        
   __IO uint32_t  PP;                                /*!< Ethernet MAC Peripheral Property Register                             */
   __IO uint32_t  PC;                                /*!< Ethernet MAC Peripheral Configuration Register                        */
   __IO uint32_t  CC;                                /*!< Ethernet MAC Clock Configuration Register                             */
+  __IO uint32_t  EPHYRIS;                           /*!< Ethernet PHY Raw Interrupt Status                                     */
+  __IO uint32_t  EPHYIM;                            /*!< Ethernet PHY Interrupt Mask                                           */
+  __IO uint32_t  EPHYMISC;                          /*!< Ethernet PHY Masked Interrupt Status and Clear                        */
 } EMAC0_Type;
 
 

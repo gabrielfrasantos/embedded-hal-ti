@@ -14,5 +14,15 @@
             "interface": "swd",
             "device": "TM4C123GH6PM"
         },
+        {
+            "name": "ek-tm4c1294xl",
+            "cwd": "${workspaceRoot}",
+            "request": "launch",
+            "executable": "${command:cmake.launchTargetPath}",
+            "type": "cortex-debug",
+            "servertype": "jlink",
+            "interface": "swd",
+            "device": "TM4C1294NCPDT"
+        },
     ]
 }

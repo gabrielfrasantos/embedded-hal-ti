@@ -1,8 +1,13 @@
-#ifndef HAL_TI_CLOCK_HPP
-#define HAL_TI_CLOCK_HPP
+#ifndef HAL_TI_CLOCK_TM4C123_HPP
+#define HAL_TI_CLOCK_TM4C123_HPP
 
 #include DEVICE_HEADER
 #include <cstdint>
+
+extern "C"
+{
+    uint32_t HAL_GetTick(void);
+}
 
 namespace hal::tiva
 {

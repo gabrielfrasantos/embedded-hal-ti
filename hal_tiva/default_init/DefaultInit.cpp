@@ -1,7 +1,13 @@
 #include DEVICE_HEADER
 #include "hal_tiva/cortex/InterruptCortex.hpp"
 #include "hal_tiva/tiva/Gpio.hpp"
-#include "hal_tiva/tiva/PinoutTableDefault.hpp"
+#if defined(TM4C123)
+#include "hal_tiva/tiva/PinoutTableDefaultTm4c123.hpp"
+#elif defined(TM4C129)
+#include "hal_tiva/tiva/PinoutTableDefaultTm4c129.hpp"
+#else
+#error "MCU family not defined or invalid [TM4C123 | TM4C129]!"
+#endif
 #include <errno.h>
 #include <sys/types.h>
 
