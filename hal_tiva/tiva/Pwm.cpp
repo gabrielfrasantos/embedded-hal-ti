@@ -2,6 +2,12 @@
 #include "infra/event/EventDispatcher.hpp"
 #include "infra/util/BitLogic.hpp"
 
+#if defined(TM4C129)
+#define NUMBER_OF_PWM   1
+#else
+#define NUMBER_OF_PWM   2
+#endif
+
 namespace hal::tiva
 {
     namespace
@@ -282,6 +288,16 @@ namespace hal::tiva
         constexpr const uint32_t SYSCTL_RCC_PWMDIV_32 = 0x00080000;  // PWM clock /32
         constexpr const uint32_t SYSCTL_RCC_PWMDIV_64 = 0x000A0000;  // PWM clock /64
 
+        constexpr const uint32_t PWM_CC_USEPWMDIV = 0x00000100;  // Use PWM Clock Divisor
+        constexpr const uint32_t PWM_CC_PWMDIV_M = 0x00000007;  // PWM Clock Divider
+        constexpr const uint32_t PWM_CC_PWMDIV_2 = 0x00000000;  // /2
+        constexpr const uint32_t PWM_CC_PWMDIV_4 = 0x00000001;  // /4
+        constexpr const uint32_t PWM_CC_PWMDIV_8 = 0x00000002;  // /8
+        constexpr const uint32_t PWM_CC_PWMDIV_16 = 0x00000003;  // /16
+        constexpr const uint32_t PWM_CC_PWMDIV_32 = 0x00000004;  // /32
+        constexpr const uint32_t PWM_CC_PWMDIV_64 = 0x00000005;  // /64
+
+#if defined(TM4C123)
         constexpr uint32_t ToRccPwmDiv(uint32_t multiplyFactor)
         {
             really_assert(multiplyFactor >= 2 && multiplyFactor <= 64 && multiplyFactor % 2 == 0);
@@ -297,12 +313,31 @@ namespace hal::tiva
                 default: std::abort();
             }
         }
+#else
+        constexpr uint32_t ToCcPwmDiv(uint32_t multiplyFactor)
+        {
+            really_assert(multiplyFactor >= 2 && multiplyFactor <= 64 && multiplyFactor % 2 == 0);
 
-        constexpr std::array<uint32_t, 2> peripheralPwmArray =
+            switch (multiplyFactor)
+            {
+                case 2: return PWM_CC_PWMDIV_2; break;
+                case 4: return PWM_CC_PWMDIV_4; break;
+                case 8: return PWM_CC_PWMDIV_8; break;
+                case 16: return PWM_CC_PWMDIV_16; break;
+                case 32: return PWM_CC_PWMDIV_32; break;
+                case 64: return PWM_CC_PWMDIV_64; break;
+                default: std::abort();
+            }
+        }
+#endif
+
+        constexpr std::array<uint32_t, NUMBER_OF_PWM> peripheralPwmArray =
         {{
             PWM0_BASE,
+#if defined(TM4C123)
             PWM1_BASE,
-        }}; 
+#endif
+        }};
 
         const infra::MemoryRange<PWM0_Type* const> peripheralPwm = infra::ReinterpretCastMemoryRange<PWM0_Type* const>(infra::MakeRange(peripheralPwmArray));
 
@@ -316,11 +351,11 @@ namespace hal::tiva
     Pwm::Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, const Config& config)
         : Pwm(aPwmIndex, channel0, channel1, PinChannel(), PinChannel(), config)
     { }
-    
+
     Pwm::Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, PinChannel channel2, const Config& config)
         : Pwm(aPwmIndex, channel0, channel1, channel2, PinChannel(), config)
     { }
-    
+
     Pwm::Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, PinChannel channel2, PinChannel channel3, const Config& config)
         : pwmIndex(aPwmIndex)
         , config(config)
@@ -345,34 +380,34 @@ namespace hal::tiva
         DisableClock();
     }
 
-    void Pwm::SetBaseFrequency(uint32_t baseFrequency)
+    void Pwm::SetBaseFrequency(hal::Hertz baseFrequency)
     {
-        auto load = (peripheralFrequency / baseFrequency) - 1;
+        auto load = (peripheralFrequency / baseFrequency.Value()) - 1;
         really_assert((load & 0xffff) == 0);
 
         this->baseFrequency = baseFrequency;
     }
 
-    void Pwm::Start(uint8_t globalDutyCycle)
+    void Pwm::Start(hal::Percent globalDutyCycle)
     {
-        really_assert(globalDutyCycle < 100);
+        really_assert(globalDutyCycle.Value() < 100);
 
         Reset();
         MasterControl();
-        
+
         for (auto& channel : channels)
         {
             channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE;
 
             Configure(channel);
 
-            auto comparator = channel.address->LOAD * globalDutyCycle / 100;
+            auto comparator = channel.address->LOAD * globalDutyCycle.Value() / 100;
 
             if (channel.a)
                 channel.address->CMPA = comparator;
             if (channel.b)
                 channel.address->CMPB = comparator;
-            
+
             channel.address->CTL |= PWM_CHANNEL_CTL_ENABLE;
         }
     }
@@ -385,20 +420,6 @@ namespace hal::tiva
         }
     }
 
-    void Pwm::DeadTime(uint8_t deadTime)
-    {
-        for (auto& channel : channels)
-        {
-            auto ctl = channel.address->CTL;
-            channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE; // Ensure channel is disabled
-
-            channel.address->DBFALL = deadTime;
-            channel.address->DBRISE = deadTime;
-            
-            channel.address->CTL = ctl;
-        }
-    }
-
     void Pwm::HandleInterrupt()
     {
 
@@ -408,8 +429,8 @@ namespace hal::tiva
     {
         if (channel.a || channel.b)
         {
-            auto load = (peripheralFrequency / baseFrequency) - 1;
-            really_assert((load & 0xffff) == 0);        
+            auto load = (peripheralFrequency / baseFrequency.Value()) - 1;
+            really_assert((load & 0xffff) == 0);
 
             channel.address->CTL &= ~PWM_CHANNEL_CTL_ENABLE;
 
@@ -422,11 +443,13 @@ namespace hal::tiva
             channel.address->CTL |= config.control.Value();
             channel.address->GENA = config.generatorA.Value();
             channel.address->GENB = config.generatorB.Value();
-            
+            channel.address->DBFALL = config.deadTime.fall;
+            channel.address->DBRISE = config.deadTime.rise;
+
             peripheralPwm[pwmIndex]->ENABLE |= channel.enable;
         }
     }
-    
+
     void Pwm::Reset()
     {
         SYSCTL->SRPWM |= 1 << pwmIndex;
@@ -448,8 +471,11 @@ namespace hal::tiva
         peripheralFrequency = SystemCoreClock;
         really_assert(frequency > (SystemCoreClock / 2));
 
+#if defined(TM4C123)
         SYSCTL->RCC = (SYSCTL->RCC & ~(SYSCTL_RCC_PWMDIV_M | SYSCTL_RCC_USEPWMDIV));
-
+#else
+        pwmArray[pwmIndex]->CC = (pwmArray[pwmIndex]->CC & ~(PWM_CC_PWMDIV_M | PWM_CC_USEPWMDIV));
+#endif
         bool needToFixClock = frequency < (peripheralFrequency / 0xffff);
 
         while (needToFixClock)
@@ -464,7 +490,13 @@ namespace hal::tiva
         }
 
         if (needToFixClock)
+        {
+#if defined(TM4C123)
             SYSCTL->RCC |= SYSCTL_RCC_USEPWMDIV | ToRccPwmDiv(divisor);
+#else
+            pwmArray[pwmIndex]->CC |= PWM_CC_USEPWMDIV | ToCcPwmDiv(divisor);
+#endif
+        }
     }
 
     void Pwm::EnableClock()

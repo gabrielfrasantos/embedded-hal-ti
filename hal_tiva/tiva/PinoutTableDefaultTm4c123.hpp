@@ -1,5 +1,5 @@
-#ifndef HAL_PINOUT_TABLE_DEFAULT_HPP
-#define HAL_PINOUT_TABLE_DEFAULT_HPP
+#ifndef HAL_PINOUT_TABLE_DEFAULT_TM4C123_HPP
+#define HAL_PINOUT_TABLE_DEFAULT_TM4C123_HPP
 
 #include "hal_tiva/tiva/Gpio.hpp"
 #include "infra/util/MemoryRange.hpp"

@@ -59,9 +59,13 @@ namespace hal::tiva
 
         struct Config
         {
-            constexpr Config()
+            constexpr Config(bool enableTx = true, bool enableRx = true)
+                : enableTx(enableTx)
+                , enableRx(enableRx)
             {}
 
+            bool enableTx = true;
+            bool enableRx = true;
             Baudrate baudrate = Baudrate::_115200_bps;
             FlowControl hwFlowControl = FlowControl::none;
             Parity parity = Parity::none;
@@ -70,8 +74,8 @@ namespace hal::tiva
             infra::Optional<InterruptPriority> priority;
         };
 
-        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, const Config& config = Config());
-        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, GpioPin& uartRts, GpioPin& uartCts, const Config& config = Config());
+        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, const Config& config = Config(true, true));
+        Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, GpioPin& uartRts, GpioPin& uartCts, const Config& config = Config(true, true));
         ~Uart();
 
         virtual void SendData(infra::MemoryRange<const uint8_t> data, infra::Function<void()> actionOnCompletion = infra::emptyFunction) override;
@@ -91,6 +95,8 @@ namespace hal::tiva
         PeripheralPin uartRx;
         infra::Optional<PeripheralPin> uartRts;
         infra::Optional<PeripheralPin> uartCts;
+        uint32_t enableTx = 0;
+        uint32_t enableRx = 0;
 
         infra::Function<void()> transferDataComplete;
         infra::Function<void(infra::ConstByteRange data)> dataReceived;

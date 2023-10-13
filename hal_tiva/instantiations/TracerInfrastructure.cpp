@@ -2,10 +2,9 @@
 
 namespace instantiations
 {
-    TracerInfrastructure::Configuration::Configuration(uint8_t index, hal::tiva::GpioPin& tx, hal::tiva::GpioPin& rx)
+    TracerInfrastructure::Configuration::Configuration(uint8_t index, hal::tiva::GpioPin& tx)
         : index(index)
         , tx(tx)
-        , rx(rx)
     {}
 
     TracerInfrastructure::TracerInfrastructure(const Configuration& configuration, bool loggingEnabled)
@@ -15,9 +14,7 @@ namespace instantiations
         , tracerOutputStream(GetStreamWriter(loggingEnabled), infra::noFail)
         , alwaysEnabledTracer(alwaysEnabledTracerOutputStream)
         , tracer(tracerOutputStream)
-    {
-        tracer.Trace() << "----------------------------------------------------------";
-    }
+    {}
 
     infra::StreamWriter& TracerInfrastructure::GetStreamWriter(bool loggingEnabled)
     {

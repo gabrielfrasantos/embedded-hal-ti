@@ -1,7 +1,7 @@
 #ifndef HAL_PWM_TIVA_HPP
 #define HAL_PWM_TIVA_HPP
 
-//#include "hal/interfaces/Spi.hpp"
+#include "hal/interfaces/Pwm.hpp"
 #include "hal_tiva/cortex/InterruptCortex.hpp"
 #include "hal_tiva/tiva/Gpio.hpp"
 #include "infra/util/BoundedVector.hpp"
@@ -11,7 +11,7 @@
 namespace hal::tiva
 {
     class Pwm
-        //: public hal::Pwm
+        : public hal::Pwm
     {
     public:
         struct Config
@@ -83,6 +83,12 @@ namespace hal::tiva
                 }
             };
 
+            struct DeadTime
+            {
+                uint8_t fall = 0xff;
+                uint8_t rise = 0xff;
+            };
+
             constexpr Config()
             {}
 
@@ -91,6 +97,7 @@ namespace hal::tiva
             Control control;
             Generator generatorA;
             Generator generatorB;
+            DeadTime deadTime;
         };
 
         struct PinChannel
@@ -102,15 +109,6 @@ namespace hal::tiva
             bool usesChannelB = false;
         };
 
-        class Channel
-        {
-        public:
-            void Start(uint8_t dutyCycle);
-            void Stop();
-            void High();
-            void Low();
-        };
-
         Pwm(uint8_t aPwmIndex, PinChannel channel0, const Config& config = Config());
         Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, const Config& config = Config());
         Pwm(uint8_t aPwmIndex, PinChannel channel0, PinChannel channel1, PinChannel channel2, const Config& config = Config());
@@ -118,10 +116,9 @@ namespace hal::tiva
 
         ~Pwm();
 
-        void SetBaseFrequency(uint32_t baseFrequency);
-        void Start(uint8_t globalDutyCycle);
-        void Stop();
-        void DeadTime(uint8_t deadTime);
+        void SetBaseFrequency(hal::Hertz baseFrequency) override;
+        void Start(hal::Percent globalDutyCycle) override;
+        void Stop() override;
 
     private:
         struct PwmChannelType
@@ -141,10 +138,10 @@ namespace hal::tiva
             __IO uint32_t  DBFALL;     /*!< PWM Dead-Band Falling-Edge-Delay       */
             __IO uint32_t  FLTSRC0;    /*!< PWM Fault Source 0                     */
             __IO uint32_t  FLTSRC1;    /*!< PWM Fault Source 1                     */
-            __IO uint32_t  MINFLTPER;  /*!< PWM Minimum Fault Period               */    
+            __IO uint32_t  MINFLTPER;  /*!< PWM Minimum Fault Period               */
         };
 
-        static constexpr std::array<uint32_t, 4> peripheralPwmChannelOffsetArray = 
+        static constexpr std::array<uint32_t, 4> peripheralPwmChannelOffsetArray =
         {{
             0x00000040, /* Channel 0 */
             0x00000080, /* Channel 1 */
@@ -188,7 +185,7 @@ namespace hal::tiva
         infra::BoundedVector<PeripheralChannels>::WithMaxSize<4> channels;
         uint32_t peripheralFrequency;
         infra::MemoryRange<PWM0_Type* const> pwmArray;
-        uint32_t baseFrequency;
+        hal::Hertz baseFrequency;
 
     private:
         void Configure(const PeripheralChannels& channel);

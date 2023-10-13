@@ -1,29 +1,55 @@
-#ifndef HAL_TI_LAUNCH_PAD_UI_HPP
-#define HAL_TI_LAUNCH_PAD_UI_HPP
+#ifndef HAL_TI_LAUNCH_PAD_HPP
+#define HAL_TI_LAUNCH_PAD_HPP
 
-#include "hal_tiva/tiva/Gpio.hpp"
-#include "hal_tiva/instantiations/TracerInfrastructure.hpp"
+#if defined(TM4C123)
+#include "hal_tiva/instantiations/LaunchPadBspEkTm4c123g.hpp"
+#include "hal_tiva/tiva/ClockTm4c123.hpp"
+#include "hal_tiva/tiva/PinoutTableDefaultTm4c123.hpp"
+#elif defined(TM4C129)
+#include "hal_tiva/instantiations/LaunchPadBspEkTm4c1294.hpp"
+#include "hal_tiva/tiva/ClockTm4c129.hpp"
+#include "hal_tiva/tiva/PinoutTableDefaultTm4c129.hpp"
+#else
+#error "MCU family not defined or invalid [TM4C123 | TM4C129]!"
+#endif
 
 namespace instantiations
 {
-    struct LaunchPadUi
+#if defined(TM4C123)
+    struct LaunchPad
     {
-        hal::tiva::GpioPin ledRed{ hal::tiva::Port::F, 1, hal::tiva::Drive::Up };
-        hal::tiva::GpioPin ledBlue{ hal::tiva::Port::F, 2, hal::tiva::Drive::Up };
-        hal::tiva::GpioPin ledGreen{ hal::tiva::Port::F, 3, hal::tiva::Drive::Up };
+        LaunchPad()
+        {
+            hal::tiva::ConfigureClock(clock.crystal, clock.oscSource);
+        }
 
-        hal::tiva::GpioPin sw1{ hal::tiva::Port::F, 4 };
-        hal::tiva::GpioPin sw2{ hal::tiva::Port::F, 0 };
+        hal::tiva::GpioPin& DebugLed()
+        {
+            return ui.ledGreen;
+        }
+
+        LaunchPadClock clock;
+        LaunchPadUi ui;
     };
-
-    struct LaunchPadTracer
+#elif defined(TM4C129)
+    struct LaunchPad
     {
-        hal::tiva::GpioPin traceUartTx{ hal::tiva::Port::A, 1 };
-        hal::tiva::GpioPin traceUartRx{ hal::tiva::Port::A, 0 };
+        LaunchPad()
+        {
+            hal::tiva::ConfigureClock(clock.frequency, clock.hseValue, clock.oscSource, clock.systemClockVco, clock.usesPll);
+        }
 
-        TracerInfrastructure tracerInfrastructure{ { 0, traceUartTx, traceUartRx } };
-        services::Tracer& tracer{ tracerInfrastructure.tracer };
+        hal::tiva::GpioPin& DebugLed()
+        {
+            return ui.led1;
+        }
+
+        LaunchPadClock clock;
+        LaunchPadUi ui;
     };
+#else
+#error "MCU family not defined or invalid [TM4C123 | TM4C129]!"
+#endif
 }
 
 #endif

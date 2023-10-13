@@ -3,6 +3,7 @@
 
 #include "hal_tiva/tiva/Gpio.hpp"
 #include "hal_tiva/synchronous_tiva/SynchronousUart.hpp"
+#include "hal_tiva/tiva/Uart.hpp"
 #include "services/tracer/StreamWriterOnSynchronousSerialCommunication.hpp"
 #include "services/tracer/TracerWithDateTime.hpp"
 
@@ -12,11 +13,11 @@ namespace instantiations
     {
         struct Configuration
         {
-            Configuration(uint8_t index, hal::tiva::GpioPin& tx, hal::tiva::GpioPin& rx);
+            Configuration(uint8_t index, hal::tiva::GpioPin& tx);
 
             uint8_t index;
             hal::tiva::GpioPin& tx;
-            hal::tiva::GpioPin& rx;
+            hal::tiva::GpioPin& dummyTx = hal::tiva::dummyPin;
         };
 
         TracerInfrastructure(const Configuration& configuration, bool loggingEnabled = true);

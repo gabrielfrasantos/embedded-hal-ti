@@ -7,6 +7,10 @@
 #include "infra/util/MemoryRange.hpp"
 #include <cstdint>
 
+#if defined(TM4C129)
+#define GPIOA_Type  GPIOA_AHB_Type
+#endif
+
 namespace hal::tiva
 {
     enum class PinConfigPeripheral : uint8_t
@@ -38,6 +42,9 @@ namespace hal::tiva
         qeiIndex,
         qeiPhaseA,
         qeiPhaseB,
+        ethernetLed0,
+        ethernetLed1,
+        ethernetLed2,
     };
 
     enum class Type : uint8_t
@@ -55,9 +62,13 @@ namespace hal::tiva
         F,
         G,
         H,
-        I,
         J,
-        K
+        K,
+        L,
+        M,
+        N,
+        P,
+        Q
     };
 
     enum class Drive : uint8_t
@@ -208,6 +219,7 @@ namespace hal::tiva
             Drive drive;
             PinConfigType config;
             Current current;
+            bool isDigital;
         };
 
     public:
@@ -230,7 +242,7 @@ namespace hal::tiva
         infra::MemoryRange<const Gpio::AnalogPinPosition> analogTable;
 
         std::array<infra::Function<void()>, 8 * 6> handlers;
-        std::array<uint32_t, 11> assignedPins;
+        std::array<uint32_t, 15> assignedPins;
 
         DispatchedInterruptHandler interruptDispatcherA;
         DispatchedInterruptHandler interruptDispatcherB;
