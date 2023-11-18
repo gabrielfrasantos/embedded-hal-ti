@@ -296,23 +296,19 @@ namespace hal::tiva
     {
         uartArray = peripheralUart;
         EnableClock();
-        Initialization(flowControl, config);
+        Initialization(config);
     }
 
     SynchronousUartSendOnly::~SynchronousUartSendOnly()
     {
-        uartArray[uartIndex]->CTL &=~ (UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE);
-        uartArray[uartIndex]->IM = 0;
+        DisableUart();
         DisableClock();
     }
 
     void SynchronousUartSendOnly::SendData(infra::ConstByteRange data)
     {
         for (auto character : data)
-        {
-            while (uartArray[uartIndex]->FR & UART_FR_TXFF) { }
-            uartArray[uartIndex]->DR = static_cast<uint8_t>(character);
-        }
+            Transmit(character);
     }
 
     bool SynchronousUartSendOnly::ReceiveData(infra::ByteRange)
@@ -320,30 +316,46 @@ namespace hal::tiva
         return false;
     }
 
-    void SynchronousUartSendOnly::Initialization(HwFlowControl flowControl, const Config& config)
+    void SynchronousUartSendOnly::Transmit(uint8_t data) const
+    {
+        while (uartArray[uartIndex]->FR & UART_FR_TXFF) { }
+        uartArray[uartIndex]->DR = data;
+    }
+
+    void SynchronousUartSendOnly::Initialization(const Config& config) const
     {
         bool is_hse = baudRateTiva.at(static_cast<uint8_t>(config.baudrate)) * 16 > SystemCoreClock;
         uint32_t baudrate = is_hse ? baudRateTiva.at(static_cast<uint8_t>(config.baudrate)) / 2 : baudRateTiva.at(static_cast<uint8_t>(config.baudrate));
         uint32_t div = (((SystemCoreClock * 8) / baudrate) + 1) / 2;
+        uint32_t lcrh = parityTiva.at(static_cast<uint8_t>(config.parity));
+        lcrh |= stopBitsTiva.at(static_cast<uint8_t>(config.stopbits));
+        lcrh |= UART_LCRH_WLEN_8;
 
-        while (uartArray[uartIndex]->FR & UART_FR_BUSY) { } /* Wait for end of TX. */
-
-        uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN; /* Disable the FIFO. */
-        uartArray[uartIndex]->CTL  &=~ ( UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE); /* Disable the UART. */
-
-        uartArray[uartIndex]->CC = UART_CC_CS_SYSCLK; /* System clock will be used in the UART */
+        DisableUart();
+        uartArray[uartIndex]->CC = UART_CC_CS_SYSCLK;
         uartArray[uartIndex]->CTL = (uartArray[uartIndex]->CTL & ~UART_CTL_HSE) | (is_hse ? UART_CTL_HSE : 0);
         uartArray[uartIndex]->IBRD = div / 64;
         uartArray[uartIndex]->FBRD = div % 64;
-        uartArray[uartIndex]->LCRH |= parityTiva.at(static_cast<uint8_t>(config.parity));
-        uartArray[uartIndex]->LCRH |= stopBitsTiva.at(static_cast<uint8_t>(config.stopbits));
-        uartArray[uartIndex]->LCRH |= UART_LCRH_WLEN_8; /* 8 bits and enable fifos */
+        uartArray[uartIndex]->LCRH = lcrh;
         uartArray[uartIndex]->FR = 0;
-        uartArray[uartIndex]->IFLS |= UART_IFLS_TX7_8; /* Set fifo level */
-        uartArray[uartIndex]->CTL |= UART_CTL_UARTEN | UART_CTL_TXE; /* Enable the UART, and Tx */
+        uartArray[uartIndex]->IFLS = UART_IFLS_TX7_8;
+        EnableUart();
     }
 
-    void SynchronousUartSendOnly::EnableClock()
+    void SynchronousUartSendOnly::DisableUart() const
+    {
+        while (uartArray[uartIndex]->FR & UART_FR_BUSY) { }
+        uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN;
+        uartArray[uartIndex]->CTL &=~ UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE;
+    }
+
+    void SynchronousUartSendOnly::EnableUart() const
+    {
+        uartArray[uartIndex]->LCRH |= UART_LCRH_FEN;
+        uartArray[uartIndex]->CTL |= UART_CTL_UARTEN | UART_CTL_TXE | UART_CTL_RXE;
+    }
+
+    void SynchronousUartSendOnly::EnableClock() const
     {
         infra::ReplaceBit(SYSCTL->RCGCUART, true, uartIndex);
 
@@ -352,7 +364,7 @@ namespace hal::tiva
         }
     }
 
-    void SynchronousUartSendOnly::DisableClock()
+    void SynchronousUartSendOnly::DisableClock() const
     {
         infra::ReplaceBit(SYSCTL->RCGCUART, false, uartIndex);
     }

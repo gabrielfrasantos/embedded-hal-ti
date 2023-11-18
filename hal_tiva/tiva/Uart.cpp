@@ -201,9 +201,9 @@ namespace hal::tiva
             921000,
         } };
 
-        const std::array<uint32_t, 4> parityTiva{ { 0x0, 0x6, 0x2 } };
+        const std::array<uint32_t, 3> parityTiva{ { 0x0, 0x6, 0x2 } };
 
-        const std::array<uint32_t, 3> stopBitsTiva{ { 0x0, 0x8 } };
+        const std::array<uint32_t, 2> stopBitsTiva{ { 0x0, 0x8 } };
 
         constexpr std::array<uint32_t, 8> peripheralUartArray =
         {{
@@ -253,44 +253,65 @@ namespace hal::tiva
         uartCts.Emplace(uartCtsPin, PinConfigPeripheral::uartCts);
     }
 
+    Uart::~Uart()
+    {
+        DisableUart();
+        uartArray[uartIndex]->IM = 0;
+        DisableClock();
+    }
+
     void Uart::Initialization(const Config& config)
     {
         bool is_hse = baudRateTiva.at(static_cast<uint8_t>(config.baudrate)) * 16 > SystemCoreClock;
         uint32_t baudrate = is_hse ? baudRateTiva.at(static_cast<uint8_t>(config.baudrate)) / 2 : baudRateTiva.at(static_cast<uint8_t>(config.baudrate));
         uint32_t div = (((SystemCoreClock * 8) / baudrate) + 1) / 2;
+        uint32_t lcrh = parityTiva.at(static_cast<uint8_t>(config.parity));
+        lcrh |= stopBitsTiva.at(static_cast<uint8_t>(config.stopbits));
+        lcrh |= UART_LCRH_WLEN_8;
 
         if (config.enableRx)
             enableRx = UART_CTL_RXE;
         if (config.enableTx)
             enableTx = UART_CTL_TXE;
 
-        while (uartArray[uartIndex]->FR & UART_FR_BUSY) { } /* Wait for end of TX. */
-
-        uartArray[uartIndex]->CTL  &=~ ( UART_CTL_UARTEN | enableTx | enableRx); /* Disable the UART. */
-        uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN; /* Disable the FIFO. */
-
+        DisableUart();
         uartArray[uartIndex]->CC |= UART_CC_CS_SYSCLK; /* System clock will be used in the UART */
-        uartArray[uartIndex]->CTL |= config.enableTx ? UART_CTL_EOT : 0; /* Transmit interrupt is generated when FIFO is empty */
         uartArray[uartIndex]->CTL = (uartArray[uartIndex]->CTL & ~UART_CTL_HSE) | (is_hse ? UART_CTL_HSE : 0);
+        uartArray[uartIndex]->CTL |= config.enableTx ? UART_CTL_EOT : 0; /* Transmit interrupt is generated when FIFO is empty */
         uartArray[uartIndex]->IBRD = div / 64;
         uartArray[uartIndex]->FBRD = div % 64;
-        uartArray[uartIndex]->LCRH |= parityTiva.at(static_cast<uint8_t>(config.parity));
-        uartArray[uartIndex]->LCRH |= stopBitsTiva.at(static_cast<uint8_t>(config.stopbits));
-        uartArray[uartIndex]->LCRH |= UART_LCRH_WLEN_8; /* 8 bits and enable fifos */
+        uartArray[uartIndex]->LCRH = lcrh;
         uartArray[uartIndex]->FR = 0;
-        uartArray[uartIndex]->IFLS |= UART_IFLS_RX7_8 | UART_IFLS_TX7_8; /* Set fifo level */
-        uartArray[uartIndex]->CTL |= UART_CTL_UARTEN | enableTx | enableRx; /* Enable the UART, RX and Tx */
+        uartArray[uartIndex]->IFLS = UART_IFLS_RX7_8 | UART_IFLS_TX7_8; /* Set fifo level */
         uartArray[uartIndex]->IM |= UART_IM_OEIM; /* Enable overrun error interrupt */
+        EnableUart();
 
         if (config.priority)
             NVIC_SetPriority(irqArray[uartIndex], static_cast<uint32_t>(*config.priority));
     }
 
-    Uart::~Uart()
+    void Uart::DisableUart() const
     {
-        uartArray[uartIndex]->CTL &=~ (UART_CTL_UARTEN | enableTx | enableRx);
-        uartArray[uartIndex]->IM = 0;
-        DisableClock();
+        while (uartArray[uartIndex]->FR & UART_FR_BUSY) { } /* Wait for end of TX. */
+        uartArray[uartIndex]->LCRH &=~ UART_LCRH_FEN; /* Disable FIFO. */
+        uartArray[uartIndex]->CTL &=~ ( UART_CTL_UARTEN | enableTx | enableRx);
+    }
+
+    void Uart::EnableUart() const
+    {
+        uartArray[uartIndex]->LCRH |= UART_LCRH_FEN; /* Enable FIFO. */
+        uartArray[uartIndex]->CTL |= UART_CTL_UARTEN | enableTx | enableRx;
+    }
+
+    void Uart::SetFifo(Fifo fifoRx, Fifo fifoTx) const
+    {
+        uartArray[uartIndex]->IFLS = (static_cast<uint32_t>(fifoRx) << 3) | static_cast<uint32_t>(fifoTx);
+    }
+
+    void Uart::EnableDma() const
+    {
+        uartArray[uartIndex]->IM |= UART_IM_RXIM | UART_IM_TXIM | UART_IM_DMARXIM | UART_IM_DMATXIM | UART_IM_RTIM;
+        uartArray[uartIndex]->DMACTL |= UART_DMACTL_RXDMAE | UART_DMACTL_TXDMAE;
     }
 
     void Uart::SendData(infra::MemoryRange<const uint8_t> data, infra::Function<void()> actionOnCompletion)
@@ -309,7 +330,7 @@ namespace hal::tiva
     {
         this->dataReceived = dataReceived;
 
-        uartArray[uartIndex]->IM = (uartArray[uartIndex]->IM & ~UART_IM_RXIM) | !dataReceived ? UART_IM_RXIM : 0; /* Enable RX interrupt */
+        uartArray[uartIndex]->IM = (uartArray[uartIndex]->IM & ~UART_IM_RXIM) | (!dataReceived ? UART_IM_RXIM : 0); /* Enable RX interrupt */
     }
 
     void Uart::RegisterInterrupt(const Config& config)
@@ -339,7 +360,7 @@ namespace hal::tiva
             {
                 uartArray[uartIndex]->ICR |= UART_ICR_RXIC;
 
-                uint8_t receivedByte = uartArray[uartIndex]->DR;
+                auto receivedByte = static_cast<uint8_t>(uartArray[uartIndex]->DR);
                 buffer.push_back(receivedByte);
             }
 
@@ -365,7 +386,7 @@ namespace hal::tiva
         }
     }
 
-    void Uart::EnableClock()
+    void Uart::EnableClock() const
     {
         infra::ReplaceBit(SYSCTL->RCGCUART, true, uartIndex);
 
@@ -374,7 +395,7 @@ namespace hal::tiva
         }
     }
 
-    void Uart::DisableClock()
+    void Uart::DisableClock() const
     {
         infra::ReplaceBit(SYSCTL->RCGCUART, false, uartIndex);
     }

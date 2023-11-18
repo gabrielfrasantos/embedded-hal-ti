@@ -109,15 +109,18 @@ namespace hal::tiva
 
         SynchronousUartSendOnly(uint8_t aUartIndex, GpioPin& uartTx, const Config& config = Config());
         SynchronousUartSendOnly(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRts, HwFlowControl flowControl, const Config& config = Config());
-        ~SynchronousUartSendOnly();
+        virtual ~SynchronousUartSendOnly();
 
         void SendData(infra::ConstByteRange data) override;
         bool ReceiveData(infra::ByteRange data) override;
 
     private:
-        void Initialization(HwFlowControl flowControl, const Config& config);
-        void EnableClock();
-        void DisableClock();
+        void Initialization(const Config& config) const;
+        void EnableClock() const;
+        void DisableClock() const;
+        void Transmit(uint8_t data) const;
+        void DisableUart() const;
+        void EnableUart() const;
 
         uint8_t uartIndex;
         PeripheralPin uartTx;

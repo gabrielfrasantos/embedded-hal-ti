@@ -11,7 +11,7 @@ namespace hal::tiva
 {
     class Uart
         : public SerialCommunication
-        , private InterruptHandler
+        , protected InterruptHandler
     {
     public:
         enum class Baudrate : uint32_t
@@ -76,20 +76,33 @@ namespace hal::tiva
 
         Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, const Config& config = Config(true, true));
         Uart(uint8_t aUartIndex, GpioPin& uartTx, GpioPin& uartRx, GpioPin& uartRts, GpioPin& uartCts, const Config& config = Config(true, true));
-        ~Uart();
+        virtual ~Uart();
 
-        virtual void SendData(infra::MemoryRange<const uint8_t> data, infra::Function<void()> actionOnCompletion = infra::emptyFunction) override;
-        virtual void ReceiveData(infra::Function<void(infra::ConstByteRange data)> dataReceived) override;
+        void SendData(infra::MemoryRange<const uint8_t> data, infra::Function<void()> actionOnCompletion = infra::emptyFunction) override;
+        void ReceiveData(infra::Function<void(infra::ConstByteRange data)> dataReceived) override;
 
-    private:
-        void EnableClock();
-        void DisableClock();
+    protected:
+        enum class Fifo : uint8_t
+        {
+            _1_8,
+            _2_8,
+            _4_8,
+            _6_8,
+            _7_8,
+        };
+
+        void EnableClock() const;
+        void DisableClock() const;
         void Initialization(const Config& config);
         void RegisterInterrupt(const Config& config);
         void TransferComplete();
-        virtual void Invoke() override;
+        void DisableUart() const;
+        void EnableUart() const;
+        void EnableDma() const;
+        void SetFifo(Fifo fifoRx, Fifo fifoTx) const;
+        void Invoke() override;
 
-    private:
+    protected:
         uint8_t uartIndex;
         PeripheralPin uartTx;
         PeripheralPin uartRx;
