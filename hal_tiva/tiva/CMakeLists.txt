@@ -19,6 +19,8 @@ target_sources(hal_tiva.tiva PRIVATE
     $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C123>:ClockTm4c123.hpp>
     $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:ClockTm4c129.cpp>
     $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:ClockTm4c129.hpp>
+    Dma.cpp
+    Dma.hpp
     $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:Ethernet.cpp>
     $<$<STREQUAL:${TARGET_MCU_FAMILY},TM4C129>:Ethernet.hpp>
     Gpio.cpp
@@ -35,6 +37,8 @@ target_sources(hal_tiva.tiva PRIVATE
     SpiMaster.hpp
     Uart.cpp
     Uart.hpp
+    UartWithDma.cpp
+    UartWithDma.hpp
     UniqueDeviceId.cpp
     UniqueDeviceId.hpp
 )
